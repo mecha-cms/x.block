@@ -27,17 +27,19 @@ class Block extends Genome {
 
     public static function replace($id, $fn, $content, $strict = false) {
         $state = Extend::state(Path::D(__DIR__, 2));
+        $union = new Union($state['union']);
         $d = '#';
         $u = $state['union'][1];
-        $ueo = $u[0][0];
-        $uec = $u[0][1];
-        $ues = $u[0][2];
-        $uas = $u[1][3];
+        $ueo = $u[0][0]; // `[[`
+        $uec = $u[0][1]; // `]]`
+        $uex = $u[0][2]; // `/`
+        $uas = $u[1][3]; // ` `
         $ueo_x = x($u[0][0], $d);
         $uec_x = x($u[0][1], $d);
-        $ues_x = x($u[0][2], $d);
+        $uex_x = x($u[0][2], $d);
         $uas_x = x($u[1][3], $d);
         $a_x = x(Anemon::NS, $d);
+        $id_x = x($id, $d);
         // no `[[` character(s) found, skip anyway …
         if (strpos($content, $ueo) === false) {
             return $content;
@@ -45,21 +47,46 @@ class Block extends Genome {
         // no `[[id]]` and `[[id/]]` character(s) found, skip …
         if (
             strpos($content, $ueo . $id . $uec) === false &&
-            strpos($content, $ueo . $id . $ues . $uec) === false
+            strpos($content, $ueo . $id . $uex . $uec) === false
         ) {
             return $content;
         }
-        $id_end = explode(Anemon::NS, $id)[0];
-        $id_end = $strict ? $id_end : $id_end . '(?:' . $a_x . '[^' . $a_x . $uas_x . ']+)*';
-        // `[[id]]content[[/id]]`
-        $a = $ueo_x . $id . '(' . $uas_x . '.*?)?' . $uec_x . '[\s\S]*?' . $ueo_x . $ues_x . $id_end . $uec_x;
-        // `[[id]]` or `[[id/]]`
-        $b = $ueo_x . $id . '(' . $uas_x . '.*?)?' . $ues_x . $uec_x;
-        return preg_replace_callback($d . $a . '|' . $b . $d, function($m) use($state, $fn) {
-            $data = (new Union($state['union']))->apart($m[0]);
-            array_shift($data); // remove “node name” data
-            return call_user_func_array($fn, $data);
-        }, $content);
+        // check for `[[/` character(s) …
+        if (strpos($content, $ueo . $uex) !== false) {
+            $id_e = explode(Anemon::NS, $id)[0];
+            $id_e_x = $strict ? x($id_e, $d) : x($id_e, $d) . '(?:' . $a_x . '[^' . $a_x . $uas_x . ']+)*';
+            // `[[id]]content[[/id]]`
+            $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uec_x . '[\s\S]*?' . $ueo_x . $uex_x . $id_e . $uec_x;
+            $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
+                $data = $union->apart($m[0]);
+                array_shift($data); // remove “node name” data
+                return call_user_func_array($fn, $data);
+            }, $content);
+        }
+        // check for `[[` character(s) after doing the previous parsing process
+        // if the character(s) still exists, it means we may have some void block(s) …
+        if (strpos($content, $ueo) !== false) {
+            // check for `[[id ` character(s), if the character(s) exists, then we may
+            // have some void block(s) with attribute(s) in it …
+            if (strpos($content, $ueo . $id . $uas) !== false) {
+                // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
+                $s = $ueo_x . $id . '(' . $uas_x . '.*?)?' . $uex_x . $uec_x;
+                $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
+                    $data = $union->apart($m[0]);
+                    array_shift($data); // remove “node name” data
+                    return call_user_func_array($fn, $data);
+                }, $content);
+            // else, void block(s) with no attribute(s)
+            // we can replace them as quick as possible …
+            } else {
+                // `[[id]]` or `[[id/]]`
+                $content = str_replace([
+                    $ueo . $id . $uec,
+                    $ueo . $id . $uex . $uec
+                ], call_user_func_array($fn, [false, []]), $content);
+            }
+        }
+        return $content;
     }
 
 }
