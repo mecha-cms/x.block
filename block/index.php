@@ -1,10 +1,10 @@
 <?php
 
-$state = Extend::state(__DIR__);
+$state = Extend::state(__DIR__, 'union');
 
 Lot::set([
-    'ue' => $state['union'][1][0],
-    'ux' => $state['union'][1][3],
+    'ue' => $state[1][0],
+    'ux' => $state[1][3],
     'uid' => uniqid()
 ], __DIR__);
 
@@ -13,7 +13,7 @@ function fn_block($data) {
     if (!empty($data['content'])) {
         $content = $data['content'];
         // no `[[` character(s) found, skip anyway …
-        if (strpos($content, $ue[0]) === false) {
+        if (strpos($content, $ue[0]) === false && strpos($content, X . $uid) === false) {
             return $data;
         }
         foreach (Block::get(null, []) as $k => $v) {

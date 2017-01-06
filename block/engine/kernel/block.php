@@ -40,6 +40,12 @@ class Block extends Genome {
         $uas_x = x($u[1][3], $d);
         $a_x = x(Anemon::NS, $d);
         $id_x = x($id, $d);
+        // quick replace with static output …
+        if (!is_callable($fn)) {
+            $fn = function() use($fn) {
+                return $fn;
+            };
+        }
         // no `[[` character(s) found, skip anyway …
         if (strpos($content, $ueo) === false) {
             return $content;
@@ -54,13 +60,13 @@ class Block extends Genome {
         // check for `[[/` character(s) …
         if (strpos($content, $ueo . $uex) !== false) {
             $id_e = explode(Anemon::NS, $id)[0];
-            $id_e_x = $strict ? x($id_e, $d) : x($id_e, $d) . '(?:' . $a_x . '[^' . $a_x . $uas_x . ']+)*';
+            $id_e_x = $strict ? $id_x : x($id_e, $d) . '(?:' . $a_x . '[^' . $a_x . $uas_x . ']+)*';
             // `[[id]]content[[/id]]`
-            $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uec_x . '[\s\S]*?' . $ueo_x . $uex_x . $id_e . $uec_x;
+            $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uec_x . '[\s\S]*?' . $ueo_x . $uex_x . $id_e_x . $uec_x;
             $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
-                $data = $union->apart($m[0]);
+                $data = $union->apart(array_shift($m));
                 array_shift($data); // remove “node name” data
-                return call_user_func_array($fn, $data);
+                return call_user_func_array($fn, array_merge($data, $m));
             }, $content);
         }
         // check for `[[` character(s) after doing the previous parsing process
@@ -72,9 +78,9 @@ class Block extends Genome {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $s = $ueo_x . $id . '(' . $uas_x . '.*?)?' . $uex_x . $uec_x;
                 $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
-                    $data = $union->apart($m[0]);
+                    $data = $union->apart(array_shift($m));
                     array_shift($data); // remove “node name” data
-                    return call_user_func_array($fn, $data);
+                    return call_user_func_array($fn, array_merge($data, $m));
                 }, $content);
             // else, void block(s) with no attribute(s)
             // we can replace them as quick as possible …
@@ -83,7 +89,7 @@ class Block extends Genome {
                 $content = str_replace([
                     $ueo . $id . $uec,
                     $ueo . $id . $uex . $uec
-                ], call_user_func_array($fn, [false, []]), $content);
+                ], call_user_func_array($fn, [false, [], []]), $content);
             }
         }
         return $content;
