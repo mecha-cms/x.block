@@ -15,7 +15,7 @@ Blocks are configurable. Even, you can create your own block markup by editing t
     0 => ['[‌[‌', '‌]‌]', '‌/‌'],
     1 => ['=', '"', '"', ' '],
     2 => ['[‌[‌!', '!‌]‌]'],
-    3 => ['`', '`']
+    3 => ['`[‌[‌', '‌]‌]`']
 ]
 ~~~
 
@@ -26,7 +26,7 @@ Blocks are configurable. Even, you can create your own block markup by editing t
 
 Following is an example of configuring block patterns as regular HTML (custom HTML tags):
 
-~~~ .xmp.no-highlight
+~~~ .xmp.txt
 <‌block‌>content<‌/‌block‌>
 ~~~
 
@@ -35,6 +35,6 @@ Following is an example of configuring block patterns as regular HTML (custom HT
     0 => ['<‌', '‌>', '‌/‌'],
     1 => ['=', '"', '"', ' '],
     2 => ['<‌!--', '--‌>'],
-    3 => ['`', '`']
+    3 => ['&lt;', '&gt;']
 ]
 ~~~
