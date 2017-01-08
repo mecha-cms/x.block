@@ -61,7 +61,7 @@ class Block extends Genome {
         // check for `[[/` character(s) …
         if (strpos($content, $ueo . $uee) !== false) {
             // `[[id]]content[[/id]]`
-            $s = $ueo_x . $id_x . '(?:' . $uas_x . '.+?)?(?:' . $uas_x . '*' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
+            $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uas_x . '*' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
             $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
                 $data = $union->apart(array_shift($m));
                 array_shift($data); // remove “node name” data
