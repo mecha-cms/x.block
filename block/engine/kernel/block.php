@@ -26,10 +26,10 @@ class Block extends Genome {
     }
 
     public static function replace($id, $fn, $content) {
-        $state = Extend::state(Path::D(__DIR__, 2));
-        $union = new Union($state['union']);
+        $state = Extend::state(Path::D(__DIR__, 2), 'union');
+        $union = new Union($state);
         $d = '#';
-        $u = $state['union'][1];
+        $u = $state[1];
         $ueo = $u[0][0]; // `[[`
         $uec = $u[0][1]; // `]]`
         $uee = $u[0][2]; // `/`
@@ -61,7 +61,7 @@ class Block extends Genome {
         // check for `[[/` character(s) …
         if (strpos($content, $ueo . $uee) !== false) {
             // `[[id]]content[[/id]]`
-            $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uas_x . '*' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
+            $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
             $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
                 $data = $union->apart(array_shift($m));
                 array_shift($data); // remove “node name” data
