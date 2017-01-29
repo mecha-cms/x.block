@@ -18,7 +18,7 @@ function fn_block_x($content) {
 
 function fn_block($content) {
     extract(Lot::get(null, [], __DIR__));
-    // no `[[` character(s) found, skip anyway …
+    // no `[[` character(s) found, skip anyway…
     if (strpos($content, $ue[0]) === false && strpos($content, X . $ui) === false) {
         return $content;
     }

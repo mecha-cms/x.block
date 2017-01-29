@@ -39,17 +39,17 @@ class Block extends Genome {
         $uee_x = x($u[0][2], $d);
         $uas_x = x($u[1][3], $d);
         $id_x = x($id, $d);
-        // quick replace with static output …
+        // quick replace with static output…
         if (!is_callable($fn)) {
             $fn = function() use($fn) {
                 return $fn;
             };
         }
-        // no `[[` character(s) found, skip anyway …
+        // no `[[` character(s) found, skip anyway…
         if (strpos($content, $ueo) === false) {
             return $content;
         }
-        // no `[[id]]`, `[[id/]]` and `[[id /]]` character(s) found, skip …
+        // no `[[id]]`, `[[id/]]` and `[[id /]]` character(s) found, skip…
         if (
             strpos($content, $ueo . $id . $uec) === false &&
             strpos($content, $ueo . $id . $uee . $uec) === false &&
