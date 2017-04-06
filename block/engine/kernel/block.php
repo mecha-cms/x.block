@@ -4,8 +4,11 @@ class Block extends Genome {
 
     protected static $lot = [];
 
-    public static function set($id, $fn) {
-        self::$lot[$id] = $fn;
+    public static function set($id, $fn, $stack = null) {
+        self::$lot[$id] = [
+            'fn' => $fn,
+            'stack' => (float) (isset($stack) ? $stack : 10)
+        ];
         return true;
     }
 

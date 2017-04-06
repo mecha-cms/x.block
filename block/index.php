@@ -20,8 +20,8 @@ function fn_block($content) {
     if (strpos($content, $ue[0]) === false && strpos($content, X . $ui) === false) {
         return $content;
     }
-    foreach (Block::get(null, []) as $k => $v) {
-        $content = call_user_func($v, $content);
+    foreach (Anemon::eat(Block::get(null, []))->sort(1, 'stack')->vomit() as $k => $v) {
+        $content = call_user_func($v['fn'], $content);
     }
     return str_replace([X . $ui, $ui . X], [$ue[0], $ue[1]], $content);
 }
