@@ -26,5 +26,5 @@ function fn_block($content) {
     return str_replace([X . $ui, $ui . X], [$ue[0], $ue[1]], $content);
 }
 
-Hook::set('page.content', 'fn_block_x', 0);
-Hook::set('page.content', 'fn_block', 1);
+Hook::set(['page.content', 'page.css', 'page.js'], 'fn_block_x', 0);
+Hook::set(['page.content', 'page.css', 'page.js'], 'fn_block', 1);
