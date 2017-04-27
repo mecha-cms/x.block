@@ -62,7 +62,7 @@ class Block extends Genome {
             return $content;
         }
         // prioritize container block(s) over void block(s)
-        // check for `[[/` character(s) …
+        // check for `[[/` character(s)…
         if (strpos($content, $ueo . $uee) !== false) {
             // `[[id]]content[[/id]]`
             $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
@@ -73,10 +73,10 @@ class Block extends Genome {
             }, $content);
         }
         // check for `[[` character(s) after doing the previous parsing process
-        // if the character(s) still exists, it means we may have some void block(s) …
+        // if the character(s) still exists, it means we may have some void block(s)…
         if (strpos($content, $ueo) !== false) {
             // check for `[[id ` character(s), if the character(s) exists, then we may
-            // have some void block(s) with attribute(s) in it …
+            // have some void block(s) with attribute(s) in it…
             if (strpos($content, $ueo . $id . $uas) !== false) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uas_x . '*' . $uee_x . $uec_x;
@@ -86,7 +86,7 @@ class Block extends Genome {
                     return call_user_func_array($fn, array_merge($data, $m));
                 }, $content);
             // else, void block(s) with no attribute(s)
-            // we can replace them as quick as possible …
+            // we can replace them quickly…
             } else {
                 // `[[id]]`, `[[id/]]` and `[[id /]]`
                 $content = str_replace([
