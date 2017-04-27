@@ -52,11 +52,12 @@ class Block extends Genome {
         if (strpos($content, $ueo) === false) {
             return $content;
         }
-        // no `[[id]]`, `[[id/]]` and `[[id /]]` character(s) found, skip…
+        // no `[[id]]`, `[[id/]]`, `[[id /]]` and `[[id ` character(s) found, skip…
         if (
             strpos($content, $ueo . $id . $uec) === false &&
             strpos($content, $ueo . $id . $uee . $uec) === false &&
-            strpos($content, $ueo . $id . $uas . $uee . $uec) === false
+            strpos($content, $ueo . $id . $uas . $uee . $uec) === false &&
+            strpos($content, $ueo . $id . $uas) === false
         ) {
             return $content;
         }
