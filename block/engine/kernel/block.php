@@ -1,6 +1,28 @@
 <?php
 
-class Block extends Genome {
+class Block extends Union {
+
+    const config = [
+        'union' => [
+            // 0 => [
+            //     0 => ['\[\[', '\]\]', '\/'],
+            //     1 => ['\=', '\"', '\"', '\s'],
+            //     2 => ['\[\[\!', '\!\]\]']
+            // ],
+            1 => [
+                0 => ['[[', ']]', '/', '[\w:.-]+'],
+                1 => ['=', '"', '"', ' ', '[\w:.-]+'],
+                2 => ['[[!', '!]]'],
+                3 => ['`[[', ']]`']
+            ]
+        ],
+        'data' => []
+    ];
+
+    public static $config = self::config;
+
+    protected $union = self::config['union'];
+    protected $data = self::config['data'];
 
     protected static $lot = [];
 
@@ -29,8 +51,8 @@ class Block extends Genome {
     }
 
     public static function replace($id, $fn, $content) {
-        $state = Extend::state(Path::D(__DIR__, 2), 'union');
-        $union = new Union($state);
+        $state = self::$config['union'];
+        $union = new static($state);
         $d = '#';
         $u = $state[1];
         $ueo = $u[0][0]; // `[[`

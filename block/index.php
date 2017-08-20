@@ -1,7 +1,11 @@
 <?php
 
+if ($state = File::exist(__DIR__ . DS . 'lot' . DS . 'state' . DS . 'config.php')) {
+    Block::$config = array_replace_recursive(Block::$config, require $state);
+}
+
 function fn_block_x($content) {
-    $state = Extend::state(__DIR__, 'union');
+    $state = Block::$config['union'];
     $ue = $state[1][0];
     $ux = $state[1][3];
     $ui = md5(__FILE__);
@@ -12,7 +16,7 @@ function fn_block_x($content) {
 }
 
 function fn_block($content) {
-    $state = Extend::state(__DIR__, 'union');
+    $state = Block::$config['union'];
     $ue = $state[1][0];
     $ux = $state[1][3];
     $ui = md5(__FILE__);
