@@ -64,17 +64,17 @@ class Block extends Union {
         $uee_x = x($u[0][2], $d);
         $uas_x = x($u[1][3], $d);
         $id_x = x($id, $d);
-        // quick replace with static output…
+        // Quick replace with static output…
         if (!is_callable($fn)) {
             $fn = function() use($fn) {
                 return $fn;
             };
         }
-        // no `[[` character(s) found, skip anyway…
+        // No `[[` character(s) found, skip anyway…
         if (strpos($content, $ueo) === false) {
             return $content;
         }
-        // no `[[id]]`, `[[id/]]`, `[[id /]]` and `[[id ` character(s) found, skip…
+        // No `[[id]]`, `[[id/]]`, `[[id /]]` and `[[id ` character(s) found, skip…
         if (
             strpos($content, $ueo . $id . $uec) === false &&
             strpos($content, $ueo . $id . $uee . $uec) === false &&
@@ -83,29 +83,29 @@ class Block extends Union {
         ) {
             return $content;
         }
-        // prioritize container block(s) over void block(s)
-        // check for `[[/` character(s)…
+        // Prioritize container block(s) over void block(s)
+        // Check for `[[/` character(s)…
         if (strpos($content, $ueo . $uee) !== false) {
             // `[[id]]content[[/id]]`
             $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
             $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
-                $data = $union->apart(array_shift($m));
-                array_shift($data); // remove “node name” data
-                return call_user_func_array($fn, array_merge($data, $m));
+                $data = $union->apart($m[0]);
+                array_shift($data); // Remove “Element.nodeName” data
+                return call_user_func_array($fn, array_merge($data, [$m]));
             }, $content);
         }
-        // check for `[[` character(s) after doing the previous parsing process
-        // if the character(s) still exists, it means we may have some void block(s)…
+        // Check for `[[` character(s) after doing the previous parsing process;
+        // If the character(s) still exists, it means we may have some void block(s)…
         if (strpos($content, $ueo) !== false) {
-            // check for `[[id ` character(s), if the character(s) exists, then we may
-            // have some void block(s) with attribute(s) in it…
+            // Check for `[[id ` character(s), if the character(s) exists,
+            // then we may have some void block(s) with attribute(s) in it…
             if (strpos($content, $ueo . $id . $uas) !== false) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
-                $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uas_x . '*' . $uee_x . $uec_x;
+                $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uas_x . '*' . $uee_x . '?' . $uec_x;
                 $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
-                    $data = $union->apart(array_shift($m));
-                    array_shift($data); // remove “node name” data
-                    return call_user_func_array($fn, array_merge($data, $m));
+                    $data = $union->apart($m[0]);
+                    array_shift($data); // Remove “Element.nodeName” data
+                    return call_user_func_array($fn, array_merge($data, [$m]));
                 }, $content);
             // else, void block(s) with no attribute(s)
             // we can replace them quickly…
@@ -115,7 +115,7 @@ class Block extends Union {
                     $ueo . $id . $uec,
                     $ueo . $id . $uee . $uec,
                     $ueo . $id . $uas . $uee . $uec
-                ], call_user_func_array($fn, [false, [], []]), $content);
+                ], call_user_func_array($fn, [false, [], [""]]), $content);
             }
         }
         return $content;
