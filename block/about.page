@@ -3,7 +3,7 @@ title: Block
 description: Block is some kind of placeholder that is available within the page content, which is normally written just like normal HTML markup, but with custom enclosing characters. Each of the block patterns then can be replaced by another contents.
 author: Taufik Nurrohman
 type: Markdown
-version: 1.1.1
+version: 1.1.2
 ...
 
 By default, a block syntax can be defined as follow. It uses `‌[‌[‌` and `‌]‌]‌` as the enclosing characters:
