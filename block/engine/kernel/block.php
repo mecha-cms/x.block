@@ -2,29 +2,9 @@
 
 class Block extends Union {
 
-    const config = [
-        'union' => [
-            // 0 => [
-            //     0 => ['\[\[', '\]\]', '\/'],
-            //     1 => ['\=', '\"', '\"', '\s'],
-            //     2 => ['\[\[\!', '\!\]\]']
-            // ],
-            1 => [
-                0 => ['[[', ']]', '/', '[\w:.-]+'],
-                1 => ['=', '"', '"', ' ', '[\w:.-]+'],
-                2 => ['[[!', '!]]'],
-                3 => ['`[[', ']]`']
-            ]
-        ],
-        'data' => []
-    ];
+    protected static $lot = [];
 
     public static $config = self::config;
-
-    protected $union = self::config['union'];
-    protected $data = self::config['data'];
-
-    protected static $lot = [];
 
     public static function set($id, $fn, $stack = null) {
         self::$lot[$id] = [
@@ -51,8 +31,9 @@ class Block extends Union {
     }
 
     public static function replace($id, $fn, $content) {
-        $state = self::$config['union'];
-        $union = new static($state);
+        $state = static::$config['union'];
+        $block = new static;
+        $block->union = $state;
         $d = '#';
         $u = $state[1];
         $ueo = $u[0][0]; // `[[`
@@ -88,8 +69,8 @@ class Block extends Union {
         if (strpos($content, $ueo . $uee) !== false) {
             // `[[id]]content[[/id]]`
             $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
-            $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
-                $data = $union->apart($m[0]);
+            $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
+                $data = $block->apart($m[0]);
                 array_shift($data); // Remove “Element.nodeName” data
                 return call_user_func_array($fn, array_merge($data, [$m]));
             }, $content);
@@ -102,8 +83,8 @@ class Block extends Union {
             if (strpos($content, $ueo . $id . $uas) !== false) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uas_x . '*' . $uee_x . '?' . $uec_x;
-                $content = preg_replace_callback($d . $s . $d, function($m) use($union, $fn) {
-                    $data = $union->apart($m[0]);
+                $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
+                    $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
                     return call_user_func_array($fn, array_merge($data, [$m]));
                 }, $content);
