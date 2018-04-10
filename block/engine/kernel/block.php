@@ -72,7 +72,7 @@ class Block extends Union {
             $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
                 $data = $block->apart($m[0]);
                 array_shift($data); // Remove “Element.nodeName” data
-                return call_user_func_array($fn, array_merge($data, [$m]));
+                return call_user_func($fn, ...array_merge($data, [$m]));
             }, $content);
         }
         // Check for `[[` character(s) after doing the previous parsing process;
@@ -86,7 +86,7 @@ class Block extends Union {
                 $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
                     $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
-                    return call_user_func_array($fn, array_merge($data, [$m]));
+                    return call_user_func($fn, ...array_merge($data, [$m]));
                 }, $content);
             // else, void block(s) with no attribute(s)
             // we can replace them quickly…
@@ -96,7 +96,7 @@ class Block extends Union {
                     $ueo . $id . $uec,
                     $ueo . $id . $uee . $uec,
                     $ueo . $id . $uas . $uee . $uec
-                ], call_user_func_array($fn, [false, [], [""]]), $content);
+                ], call_user_func($fn, false, [], [""]), $content);
             }
         }
         return $content;

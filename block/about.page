@@ -1,7 +1,7 @@
 ---
 title: Block
 description: >
-  Block is some kind of placeholder that is available within the page content, which is
+  Block is a kind of placeholder that can be embedded within the page content, which is
   normally written just like normal HTML markup, but with custom enclosing characters.
   Each of the block patterns then can be replaced by another contents.
 author: Taufik Nurrohman
