@@ -84,6 +84,7 @@ class Block extends Union {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uas_x . '*' . $uee_x . '?' . $uec_x;
                 $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
+                    $m[0] = To::HTML($m[0]); // TODO: Set maintainable fix for `markdown` plugin that replace(s) `"` with `&quot;`
                     $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
                     return call_user_func($fn, ...array_merge($data, [$m]));
