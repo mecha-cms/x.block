@@ -6,7 +6,7 @@ description: >
   Each of the block patterns then can be replaced by another contents.
 author: Taufik Nurrohman
 type: Markdown
-version: 1.1.2
+version: 1.2.0
 ...
 
 By default, a block syntax can be defined as follow. It uses `‌[‌[‌` and `‌]‌]‌` as the enclosing characters:

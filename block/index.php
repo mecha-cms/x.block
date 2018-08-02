@@ -1,7 +1,7 @@
 <?php
 
-if ($state = File::exist(__DIR__ . DS . 'lot' . DS . 'state' . DS . 'config.php')) {
-    Block::$config = array_replace_recursive(Block::$config, require $state);
+if ($state = Extend::state('block')) {
+    Block::$config = array_replace_recursive(Block::$config, $state);
 }
 
 function fn_block_x($content, $lot = [], $that = null, $key = null) {
