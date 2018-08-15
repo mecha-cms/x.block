@@ -1,6 +1,6 @@
 <?php
 
-if ($state = Extend::state('block')) {
+if ($state = Extend::state('block', [])) {
     Block::$config = array_replace_recursive(Block::$config, $state);
 }
 
