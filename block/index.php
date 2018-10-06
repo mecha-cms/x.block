@@ -4,30 +4,40 @@ if ($state = Extend::state('block', [])) {
     Block::$config = array_replace_recursive(Block::$config, $state);
 }
 
-function fn_block_x($content, $lot = [], $that = null, $key = null) {
-    $state = Block::$config['union'];
-    $ue = $state[1][0];
-    $ux = $state[1][3];
-    $ui = md5(__FILE__);
-    if (strpos($content, $ux[0]) === false) {
+function fn_block_x($content) {
+    $union = Block::$config['union'];
+    $hash = md5(__FILE__);
+    $esc = $union[1][3];
+    if (strpos($content, $esc[0]) === false) {
         return $content;
     }
-    return str_replace([$ux[0], $ux[1]], [X . $ui, $ui . X], $content);
+    return str_replace([$esc[0], $esc[1]], [X . $hash, $hash . X], $content);
 }
 
-function fn_block($content, $lot = [], $that = null, $key = null) {
-    $state = Block::$config['union'];
-    $ue = $state[1][0];
-    $ux = $state[1][3];
-    $ui = md5(__FILE__);
+function fn_block($content) {
+    $union = Block::$config['union'];
+    $hash = md5(__FILE__);
+    $block = $union[1][0];
+    $esc = $union[1][3];
     // No `[[` character(s) found, skip anyway…
-    if (strpos($content, $ue[0]) === false && strpos($content, X . $ui) === false) {
+    if (strpos($content, $block[0]) === false && strpos($content, X . $hash) === false) {
         return $content;
     }
-    foreach (Anemon::eat(Block::get(null, []))->sort([1, 'stack'])->vomit() as $k => $v) {
-        $content = call_user_func($v['fn'], $content, $lot, $that, $key);
+    foreach (g(BLOCK, 'data', GLOB_NOSORT) as $v) {
+        $content = Block::replace($k = Path::N($v), function($a, $b) use($k, $v) {
+            $data = [
+                0 => $k,
+                1 => $a,
+                2 => $b
+            ];
+            $data[2] = json_encode($data[2]);
+            return __replace__(file_get_contents($v), array_replace($data, $b));
+        }, $content);
     }
-    return str_replace([X . $ui, $ui . X], [$ue[0], $ue[1]], $content);
+    foreach (Anemon::eat(Block::get(null, []))->sort([1, 'stack'], true)->vomit() as $k => $v) {
+        $content = Block::replace($k, $v['fn'], $content);
+    }
+    return str_replace([X . $hash, $hash . X], [$block[0], $block[1]], $content);
 }
 
 Hook::set([

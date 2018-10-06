@@ -7,23 +7,27 @@ class Block extends Union {
     public static $config = self::config;
 
     public static function set($id, $fn, $stack = null) {
-        self::$lot[$id] = [
-            'fn' => $fn,
-            'stack' => (float) (isset($stack) ? $stack : 10)
-        ];
-        return true;
+        if (!isset(self::$lot[0][$id])) {
+            self::$lot[1][$id] = [
+                'fn' => $fn,
+                'stack' => (float) (isset($stack) ? $stack : 10)
+            ];
+            return true;
+        }
+        return false;
     }
 
     public static function get($id = null, $fail = false) {
         if (isset($id)) {
-            return array_key_exists($id, self::$lot) ? self::$lot[$id] : $fail;
+            return array_key_exists($id, self::$lot[1]) ? self::$lot[$id][1] : $fail;
         }
-        return !empty(self::$lot) ? self::$lot : $fail;
+        return !empty(self::$lot[1]) ? self::$lot[1] : $fail;
     }
 
     public static function reset($id = null) {
         if (isset($id)) {
-            unset(self::$lot[$id]);
+            self::$lot[0][$id] = 1;
+            unset(self::$lot[1][$id]);
         } else {
             self::$lot = [];
         }
@@ -31,20 +35,19 @@ class Block extends Union {
     }
 
     public static function replace($id, $fn, $content) {
-        $state = static::$config['union'];
+        $id_x = x($id, $d = '#');
+        $state = static::$config;
         $block = new static;
-        $block->union = $state;
-        $d = '#';
-        $u = $state[1];
-        $ueo = $u[0][0]; // `[[`
-        $uec = $u[0][1]; // `]]`
-        $uee = $u[0][2]; // `/`
-        $uas = $u[1][3]; // ` `
-        $ueo_x = x($u[0][0], $d);
-        $uec_x = x($u[0][1], $d);
-        $uee_x = x($u[0][2], $d);
-        $uas_x = x($u[1][3], $d);
-        $id_x = x($id, $d);
+        $u = $state['union'][1];
+        $x = isset($state['union'][0]) ? $state['union'][0] : [];
+        $block_open = $u[0][0]; // `[[`
+        $block_close = $u[0][1]; // `]]`
+        $block_end = $u[0][2]; // `/`
+        $block_separator = $u[1][3]; // ` `
+        $block_open_x = isset($x[0][0]) ? $x[0][0] : x($block_open, $d);
+        $block_close_x = isset($x[0][1]) ? $x[0][1] : x($block_close, $d);
+        $block_end_x = isset($x[0][2]) ? $x[0][2] : x($block_end, $d);
+        $block_separator_x = isset($x[1][3]) ? $x[1][3] : x($block_separator, $d);
         // Quick replace with static output…
         if (!is_callable($fn)) {
             $fn = function() use($fn) {
@@ -52,39 +55,40 @@ class Block extends Union {
             };
         }
         // No `[[` character(s) found, skip anyway…
-        if (strpos($content, $ueo) === false) {
+        if (strpos($content, $block_open) === false) {
             return $content;
         }
         // No `[[id]]`, `[[id/]]`, `[[id /]]` and `[[id ` character(s) found, skip…
         if (
-            strpos($content, $ueo . $id . $uec) === false &&
-            strpos($content, $ueo . $id . $uee . $uec) === false &&
-            strpos($content, $ueo . $id . $uas . $uee . $uec) === false &&
-            strpos($content, $ueo . $id . $uas) === false
+            strpos($content, $block_open . $id . $block_close) === false &&
+            strpos($content, $block_open . $id . $block_end . $block_close) === false &&
+            strpos($content, $block_open . $id . $block_separator . $block_end . $block_close) === false &&
+            strpos($content, $block_open . $id . $block_separator) === false
         ) {
             return $content;
         }
         // Prioritize container block(s) over void block(s)
-        // Check for `[[/` character(s)…
-        if (strpos($content, $ueo . $uee) !== false) {
+        // Check for `[[/id]]` character(s)…
+        if (strpos($content, $block_open . $block_end . $id . $block_close) !== false) {
             // `[[id]]content[[/id]]`
-            $s = $ueo_x . $id_x . '(?:' . $uas_x . '.*?)?(?:' . $uee_x . $uec_x . '|' . $uec_x . '(?:[\s\S]*?' . $ueo_x . $uee_x . $id_x . $uec_x . ')?)';
-            $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
+            $pattern = $block_open_x . $id_x . '(?:' . $block_separator_x . '.*?)?(?:' . $block_end_x . $block_close_x . '|' . $block_close_x . '(?:[\s\S]*?' . $block_open_x . $block_end_x . $id_x . $block_close_x . ')?)';
+            $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $fn, $state) {
+                $m[0] = str_replace('&quot;', '"', $m[0]); // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
                 $data = $block->apart($m[0]);
                 array_shift($data); // Remove “Element.nodeName” data
                 return call_user_func($fn, ...array_merge($data, [$m]));
             }, $content);
         }
-        // Check for `[[` character(s) after doing the previous parsing process;
+        // Check for `[[id` character(s) after doing the previous parsing process;
         // If the character(s) still exists, it means we may have some void block(s)…
-        if (strpos($content, $ueo) !== false) {
+        if (strpos($content, $block_open . $id) !== false) {
             // Check for `[[id ` character(s), if the character(s) exists,
             // then we may have some void block(s) with attribute(s) in it…
-            if (strpos($content, $ueo . $id . $uas) !== false) {
+            if (strpos($content, $block_open . $id . $block_separator) !== false) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
-                $s = $ueo_x . $id_x . '(' . $uas_x . '.*?)?' . $uas_x . '*' . $uee_x . '?' . $uec_x;
-                $content = preg_replace_callback($d . $s . $d, function($m) use($block, $fn) {
-                    $m[0] = To::HTML($m[0]); // TODO: Set maintainable fix for `markdown` plugin that replace(s) `"` with `&quot;`
+                $pattern = $block_open_x . $id_x . '(' . $block_separator_x . '.*?)?' . $block_separator_x . '*' . $block_end_x . '?' . $block_close_x;
+                $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $fn) {
+                    $m[0] = str_replace('&quot;', '"', $m[0]); // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
                     $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
                     return call_user_func($fn, ...array_merge($data, [$m]));
@@ -94,9 +98,9 @@ class Block extends Union {
             } else {
                 // `[[id]]`, `[[id/]]` and `[[id /]]`
                 $content = str_replace([
-                    $ueo . $id . $uec,
-                    $ueo . $id . $uee . $uec,
-                    $ueo . $id . $uas . $uee . $uec
+                    $block_open . $id . $block_close,
+                    $block_open . $id . $block_end . $block_close,
+                    $block_open . $id . $block_separator . $block_end . $block_close
                 ], call_user_func($fn, false, [], [""]), $content);
             }
         }
