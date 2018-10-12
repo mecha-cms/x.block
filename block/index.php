@@ -31,7 +31,7 @@ function v($content) {
                 2 => $b
             ];
             $data[2] = json_encode($data[2]);
-            return \__replace__(file_get_contents($v), array_replace($data, $b));
+            return \replace(file_get_contents($v), array_replace($data, $b));
         }, $content);
     }
     foreach (\Anemon::eat(\Block::get(null, []))->sort([1, 'stack'], true)->vomit() as $k => $v) {
