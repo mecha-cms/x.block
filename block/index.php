@@ -1,7 +1,7 @@
 <?php namespace fn\block;
 
 if ($state = \Extend::state('block', [])) {
-    \Block::$config = array_replace_recursive(\Block::$config, $state);
+    \Block::$config = extend(\Block::$config, $state);
 }
 
 function x($content) {
@@ -31,7 +31,7 @@ function v($content) {
                 2 => $b
             ];
             $data[2] = json_encode($data[2]);
-            return \replace(file_get_contents($v), array_replace($data, $b));
+            return \candy(file_get_contents($v), extend($data, $b));
         }, $content);
     }
     foreach (\Anemon::eat(\Block::get(null, []))->sort([1, 'stack'], true)->vomit() as $k => $v) {

@@ -76,7 +76,7 @@ class Block extends Union {
                 $m[0] = str_replace('&quot;', '"', $m[0]); // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
                 $data = $block->apart($m[0]);
                 array_shift($data); // Remove “Element.nodeName” data
-                return call_user_func($fn, ...array_merge($data, [$m]));
+                return call_user_func($fn, ...concat($data, [$m]));
             }, $content);
         }
         // Check for `[[id` character(s) after doing the previous parsing process;
@@ -91,7 +91,7 @@ class Block extends Union {
                     $m[0] = str_replace('&quot;', '"', $m[0]); // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
                     $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
-                    return call_user_func($fn, ...array_merge($data, [$m]));
+                    return call_user_func($fn, ...concat($data, [$m]));
                 }, $content);
             // else, void block(s) with no attribute(s)
             // we can replace them quickly…
