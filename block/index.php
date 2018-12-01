@@ -23,7 +23,7 @@ function v($content) {
     if (strpos($content, $block[0]) === false && strpos($content, X . $hash) === false) {
         return $content;
     }
-    foreach (\g(BLOCK, 'data', GLOB_NOSORT) as $v) {
+    foreach (\g(BLOCK, 'data') as $v) {
         $content = \Block::replace($k = \Path::N($v), function($a, $b) use($k, $v) {
             $data = [
                 0 => $k,
@@ -34,7 +34,7 @@ function v($content) {
             return \candy(file_get_contents($v), extend($data, $b));
         }, $content);
     }
-    foreach (\Anemon::eat(\Block::get(null, []))->sort([1, 'stack'], true)->vomit() as $k => $v) {
+    foreach (\Anemon::eat(\Block::get(null, []))->sort([1, 'stack'], true) as $k => $v) {
         $content = \Block::replace($k, $v['fn'], $content);
     }
     return str_replace([X . $hash, $hash . X], [$block[0], $block[1]], $content);
@@ -44,12 +44,16 @@ function v($content) {
     '*.content',
     '*.css',
     '*.description',
-    '*.js'
-], __NAMESPACE__ . '\x', 0);
+    '*.image',
+    '*.js',
+    '*.link'
+], __NAMESPACE__ . "\\x", 0);
 
 \Hook::set([
     '*.content',
     '*.css',
     '*.description',
-    '*.js'
-], __NAMESPACE__ . '\v', 1);
+    '*.image',
+    '*.js',
+    '*.link'
+], __NAMESPACE__ . "\\v", 1);
