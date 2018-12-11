@@ -4,7 +4,7 @@ if ($state = \Extend::state('block', [])) {
     \Block::$config = extend(\Block::$config, $state);
 }
 
-function x($content) {
+function _x($content) {
     $union = \Block::$config['union'];
     $hash = md5(__FILE__);
     $esc = $union[1][3];
@@ -14,7 +14,7 @@ function x($content) {
     return str_replace([$esc[0], $esc[1]], [X . $hash, $hash . X], $content);
 }
 
-function v($content) {
+function _v($content) {
     $union = \Block::$config['union'];
     $hash = md5(__FILE__);
     $block = $union[1][0];
@@ -47,7 +47,7 @@ function v($content) {
     '*.image',
     '*.js',
     '*.link'
-], __NAMESPACE__ . "\\x", 0);
+], __NAMESPACE__ . "\\_x", 0);
 
 \Hook::set([
     '*.content',
@@ -56,4 +56,4 @@ function v($content) {
     '*.image',
     '*.js',
     '*.link'
-], __NAMESPACE__ . "\\v", 1);
+], __NAMESPACE__ . "\\_v", 1);

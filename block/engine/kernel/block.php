@@ -6,7 +6,7 @@ class Block extends Union {
 
     public static $config = self::config;
 
-    public static function set(string $id, callable $fn, float $stack = null) {
+    public static function set(string $id, $fn, float $stack = null) {
         if (!isset(self::$lot[0][$id])) {
             self::$lot[1][$id] = [
                 'fn' => $fn,
