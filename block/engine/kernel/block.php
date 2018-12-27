@@ -4,6 +4,7 @@ class Block extends Union {
 
     protected static $lot = [];
 
+    // Inherit to `Union`
     public static $config = self::config;
 
     public static function set(string $id, $fn, float $stack = null) {
@@ -36,7 +37,7 @@ class Block extends Union {
 
     public static function replace(string $id, $fn, string $content) {
         $id_x = x($id, $d = '#');
-        $state = static::$config;
+        $state = self::$config;
         $block = new static;
         $u = $state['union'][1];
         $x = $state['union'][0] ?? [];
