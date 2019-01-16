@@ -35,7 +35,7 @@ class Block extends Union {
         return true;
     }
 
-    public static function replace(string $id, $fn, string $content, $that = null, $scope = null) {
+    public static function replace(string $id, $fn, string $content) {
         $id_x = x($id, $d = '#');
         $state = static::$config;
         $block = new static;
@@ -75,7 +75,7 @@ class Block extends Union {
         if (strpos($content, $block_open . $block_end . $id . $block_close) !== false) {
             // `[[id]]content[[/id]]`
             $pattern = $block_open_x . $id_x . '(?:' . $block_separator_x . '.*?)?(?:' . $block_end_x . $block_close_x . '|' . $block_close_x . '(?:[\s\S]*?' . $block_open_x . $block_end_x . $id_x . $block_close_x . ')?)';
-            $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $block_q_close, $block_q_open, $fn, $scope, $that) {
+            $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $block_q_close, $block_q_open, $fn) {
                 // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
                 if (strpos($m[0], $block_q_open) === false) {
                     $m[0] = str_replace(htmlentities($block_q_open), $block_q_open, $m[0]);
@@ -85,7 +85,7 @@ class Block extends Union {
                 }
                 $data = $block->apart($m[0]);
                 array_shift($data); // Remove “Element.nodeName” data
-                return fn($fn, concat($data, [$m]), $that, $scope);
+                return call_user_func($fn, ...concat($data, [$m]));
             }, $content);
         }
         // Check for `[[id` character(s) after doing the previous parsing process;
@@ -96,7 +96,7 @@ class Block extends Union {
             if (strpos($content, $block_open . $id . $block_separator) !== false) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $pattern = $block_open_x . $id_x . '(' . $block_separator_x . '.*?)?' . $block_separator_x . '*' . $block_end_x . '?' . $block_close_x;
-                $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $block_q_close, $block_q_open, $fn, $scope, $that) {
+                $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $block_q_close, $block_q_open, $fn) {
                     // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
                     if (strpos($m[0], $block_q_open) === false) {
                         $m[0] = str_replace(htmlentities($block_q_open), $block_q_open, $m[0]);
@@ -106,7 +106,7 @@ class Block extends Union {
                     }
                     $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
-                    return fn($fn, concat($data, [$m]), $that, $scope);
+                    return call_user_func($fn, ...concat($data, [$m]));
                 }, $content);
             // Else; void block(s) with no attribute(s), replace them quickly…
             } else {
@@ -115,7 +115,7 @@ class Block extends Union {
                     $block_open . $id . $block_close,
                     $block_open . $id . $block_end . $block_close,
                     $block_open . $id . $block_separator . $block_end . $block_close
-                ], fn($fn, [false, [], [""]], $that, $scope), $content);
+                ], call_user_func($fn, false, [], [""]), $content);
             }
         }
         return $content;
