@@ -44,8 +44,6 @@ class Block extends Union {
         $block_open = $u[0][0]; // `[[`
         $block_close = $u[0][1]; // `]]`
         $block_end = $u[0][2]; // `/`
-        $block_q_open = $u[1][1]; // `"`
-        $block_q_close = $u[1][2]; // `"`
         $block_separator = $u[1][3]; // ` `
         $block_open_x = $x[0][0] ?? x($block_open, $d);
         $block_close_x = $x[0][1] ?? x($block_close, $d);
@@ -75,14 +73,7 @@ class Block extends Union {
         if (strpos($content, $block_open . $block_end . $id . $block_close) !== false) {
             // `[[id]]content[[/id]]`
             $pattern = $block_open_x . $id_x . '(?:' . $block_separator_x . '.*?)?(?:' . $block_end_x . $block_close_x . '|' . $block_close_x . '(?:[\s\S]*?' . $block_open_x . $block_end_x . $id_x . $block_close_x . ')?)';
-            $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $block_q_close, $block_q_open, $fn) {
-                // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
-                if (strpos($m[0], $block_q_open) === false) {
-                    $m[0] = str_replace(htmlentities($block_q_open), $block_q_open, $m[0]);
-                }
-                if (strpos($m[0], $block_q_close) === false) {
-                    $m[0] = str_replace(htmlentities($block_q_close), $block_q_close, $m[0]);
-                }
+            $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $fn) {
                 $data = $block->apart($m[0]);
                 array_shift($data); // Remove “Element.nodeName” data
                 return call_user_func($fn, ...concat($data, [$m]));
@@ -96,14 +87,7 @@ class Block extends Union {
             if (strpos($content, $block_open . $id . $block_separator) !== false) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $pattern = $block_open_x . $id_x . '(' . $block_separator_x . '.*?)?' . $block_separator_x . '*' . $block_end_x . '?' . $block_close_x;
-                $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $block_q_close, $block_q_open, $fn) {
-                    // TODO: Set proper fix for `markdown` plugin that replace(s) `"` with `&quot;`
-                    if (strpos($m[0], $block_q_open) === false) {
-                        $m[0] = str_replace(htmlentities($block_q_open), $block_q_open, $m[0]);
-                    }
-                    if (strpos($m[0], $block_q_close) === false) {
-                        $m[0] = str_replace(htmlentities($block_q_close), $block_q_close, $m[0]);
-                    }
+                $content = preg_replace_callback($d . $pattern . $d, function($m) use($block, $fn) {
                     $data = $block->apart($m[0]);
                     array_shift($data); // Remove “Element.nodeName” data
                     return call_user_func($fn, ...concat($data, [$m]));
