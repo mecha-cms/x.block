@@ -6,8 +6,8 @@ if ($state = \Extend::state('block', [])) {
 
 function _x($content) {
     $union = \Block::$config['union'];
-    $hash = \md5(__FILE__);
-    $esc = $union[1][3];
+    $hash = X . \md5(__FILE__) . X;
+    $esc = $union[1][2];
     if (\strpos($content, $esc[0]) === false) {
         return $content;
     }
@@ -16,9 +16,9 @@ function _x($content) {
 
 function _v($content) {
     $union = \Block::$config['union'];
-    $hash = \md5(__FILE__);
+    $hash = X . \md5(__FILE__) . X;
     $block = $union[1][0];
-    $esc = $union[1][3];
+    $esc = $union[1][2];
     // No `[[` character(s) found, skip anyway…
     if (\strpos($content, $block[0]) === false && \strpos($content, X . $hash) === false) {
         return $content;

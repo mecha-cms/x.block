@@ -3,7 +3,7 @@ title: Block
 description: Placeholder.
 author: Taufik Nurrohman
 type: Markdown
-version: 1.4.4
+version: 1.4.5
 ...
 
 Block is a kind of placeholder that can be embedded in the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern can then be converted into something more complex.
@@ -21,15 +21,13 @@ Blocks are configurable. Even, you can specify your own block markup by editing 
 1 => [
     0 => ['[‌[‌', '‌]‌]', '‌/‌'],
     1 => ['=', '"', '"', ' '],
-    2 => ['[‌[‌!', '!‌]‌]'],
-    3 => ['`[‌[‌', '‌]‌]`']
+    2 => ['`[‌[‌', '‌]‌]`']
 ]
 ~~~
 
  - The `0` parts are configuration for the block tag.
  - The `1` parts are configuration for the block tag’s attribute.
- - The `2` parts are for the block comment markup.
- - The `3` parts are for the escape marker.
+ - The `2` parts are for the escape marker.
 
 Following is an example of configuring block pattern as regular HTML (custom HTML tags):
 
@@ -41,7 +39,6 @@ Following is an example of configuring block pattern as regular HTML (custom HTM
 1 => [
     0 => ['<‌', '‌>', '‌/‌'],
     1 => ['=', '"', '"', ' '],
-    2 => ['<‌!--', '--‌>'],
     3 => ['&lt;', '&gt;']
 ]
 ~~~
