@@ -1,26 +1,13 @@
-<?php namespace fn\block;
+<?php namespace fn;
 
-if ($state = \Extend::state('block', [])) {
-    \Block::$config = \extend(\Block::$config, $state);
+if ($state = \Extend::state('block')) {
+    \Block::$config = \extend(\Block::$config, (array) $state);
 }
 
-function _x($content) {
-    $union = \Block::$config['union'];
-    $hash = X . \md5(__FILE__) . X;
-    $esc = $union[1][2];
-    if (\strpos($content, $esc[0]) === false) {
-        return $content;
-    }
-    return \str_replace([$esc[0], $esc[1]], [X . $hash, $hash . X], $content);
-}
-
-function _v($content) {
-    $union = \Block::$config['union'];
-    $hash = X . \md5(__FILE__) . X;
-    $block = $union[1][0];
-    $esc = $union[1][2];
+function block($content) {
+    $c = \Block::$config;
     // No `[[` character(s) found, skip anyway…
-    if (\strpos($content, $block[0]) === false && \strpos($content, X . $hash) === false) {
+    if (\strpos($content, $c[0][0]) === false) {
         return $content;
     }
     foreach (\g(BLOCK, 'data') as $v) {
@@ -34,10 +21,10 @@ function _v($content) {
             return \candy(\file_get_contents($v), \extend($data, $b));
         }, $content);
     }
-    foreach (\Anemon::eat(\Block::get(null, []))->sort([1, 'stack'], true) as $k => $v) {
+    foreach (\Anemon::eat(\Block::get())->sort([1, 'stack'], true) as $k => $v) {
         $content = \Block::replace($k, $v['fn'], $content);
     }
-    return \str_replace([X . $hash, $hash . X], [$block[0], $block[1]], $content);
+    return $content;
 }
 
 \Hook::set([
@@ -47,13 +34,4 @@ function _v($content) {
     '*.image',
     '*.js',
     '*.link'
-], __NAMESPACE__ . "\\_x", 0);
-
-\Hook::set([
-    '*.content',
-    '*.css',
-    '*.description',
-    '*.image',
-    '*.js',
-    '*.link'
-], __NAMESPACE__ . "\\_v", 1);
+], __NAMESPACE__ . "\\block", 1);
