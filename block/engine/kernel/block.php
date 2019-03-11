@@ -90,11 +90,11 @@ final class Block extends SGML {
         }
     }
 
-    public static function set(string $id, $fn, float $stack = null) {
+    public static function set(string $id, $fn, float $stack = 10) {
         if (!isset(self::$block[0][$id])) {
             self::$block[1][$id] = [
                 'fn' => $fn,
-                'stack' => (float) ($stack ?? 10)
+                'stack' => (float) $stack
             ];
             return true;
         }
