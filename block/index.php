@@ -1,4 +1,4 @@
-<?php namespace fn;
+<?php namespace _;
 
 if ($state = \Extend::state('block')) {
     \Block::$config = \extend(\Block::$config, (array) $state);
