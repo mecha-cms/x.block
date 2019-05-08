@@ -3,7 +3,7 @@
 final class Block extends SGML {
 
     const config = [
-        0 => ['<', '>', '/'],
+        0 => ['[[', ']]', '/'],
         1 => ['"', '"', '=']
     ];
 
@@ -81,7 +81,7 @@ final class Block extends SGML {
         return $content;
     }
 
-    public static function reset(string $id = null) {
+    public static function let(string $id = null) {
         if (isset($id)) {
             self::$block[0][$id] = 1;
             unset(self::$block[1][$id]);
