@@ -6,7 +6,7 @@ type: Markdown
 version: 1.5.0
 ...
 
-Block is a kind of placeholder that can be embedded in the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern can then be converted into something more complex.
+Block is a kind of placeholder that can be embedded within the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern can then be converted into something more complex.
 
 By default, a block syntax can be defined as follow. It uses `‌[‌[‌` and `‌]‌]‌` as the enclosing characters:
 
