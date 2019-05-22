@@ -25,7 +25,7 @@ function block($content) {
             return $content;
         }, $content);
     }
-    foreach (\Anemon::eat(\Block::get())->sort([1, 'stack'], true) as $k => $v) {
+    foreach (\Anemon::from(\Block::get())->sort([1, 'stack'], true) as $k => $v) {
         $content = \Block::replace($k, $v['fn'], $content);
     }
     return $content;
