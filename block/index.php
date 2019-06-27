@@ -1,6 +1,6 @@
 <?php namespace _;
 
-if ($state = \extend('block')) {
+if ($state = \extension('block')) {
     \Block::$config = \alter(\Block::$config, (array) $state);
 }
 
