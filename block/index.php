@@ -1,7 +1,7 @@
 <?php namespace _;
 
 if ($state = \extension('block')) {
-    \Block::$config = \alter(\Block::$config, (array) $state);
+    \Block::$config = \extend(\Block::$config, (array) $state);
 }
 
 function block($content) {
