@@ -1,6 +1,6 @@
 <?php namespace _;
 
-if ($state = \extension('block')) {
+if ($state = \state('block')) {
     \Block::$config = \extend(\Block::$config, (array) $state);
 }
 
@@ -32,10 +32,10 @@ function block($content) {
 }
 
 \Hook::set([
-    '*.content',
-    '*.css',
-    '*.description',
-    '*.image',
-    '*.js',
-    '*.link'
+    'page.content',
+    'page.css',
+    'page.description',
+    'page.image',
+    'page.js',
+    'page.link'
 ], __NAMESPACE__ . "\\block", 1);
