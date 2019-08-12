@@ -3,7 +3,7 @@ title: Block
 description: Placeholder.
 author: Taufik Nurrohman
 type: Markdown
-version: 1.6.0
+version: 1.6.1
 ...
 
 Block is a kind of placeholder that can be embedded within the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern can then be converted into something more complex.

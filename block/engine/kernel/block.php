@@ -54,7 +54,7 @@ final class Block extends SGML {
             // `[[id]]content[[/id]]`
             $content = preg_replace_callback('/' . $open_x . $id_x . '(?:[ ][^' . $close_x . ']*)?(?:' . $end_x . $close_x . '|' . $close_x . '(?:(?:[\s\S](?!' . $open_x . $id_x . '(?: |' . $close_x . ')))*?' . $open_x . $end_x . $id_x . $close_x . ')?)/', function($m) use($fn) {
                 $data = new static($m[0]);
-                return call_user_func($fn, $data[1], $data[2], $m);
+                return call_user_func($fn, $data[1], e($data[2]), $m);
             }, $content);
         }
         // Check for `[[id` character(s) after doing the previous parsing process;
@@ -66,7 +66,7 @@ final class Block extends SGML {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $content = preg_replace_callback('/' . $open_x . $id_x . '([ ].*?)?[ ]*' . $end_x . '?' . $close_x . '/', function($m) use($fn) {
                     $data = new static($m[0]);
-                    return call_user_func($fn, $data[1], $data[2], $m);
+                    return call_user_func($fn, $data[1], e($data[2]), $m);
                 }, $content);
             // Else; void block(s) with no attribute(s), replace them quickly…
             } else {
