@@ -10,8 +10,8 @@ function block($content) {
     if (\strpos($content, $c[0][0]) === false) {
         return $content;
     }
-    foreach (\g(BLOCK, 'data') as $k => $v) {
-        $content = \Block::replace($n = \Path::N($k), function($a, $b) use($n, $k) {
+    foreach (\g(\BLOCK, 'data') as $k => $v) {
+        $content = \Block::alter($n = \Path::N($k), function($a, $b) use($n, $k) {
             $data = [
                 0 => $n,
                 1 => $a,
@@ -25,8 +25,8 @@ function block($content) {
             return $content;
         }, $content);
     }
-    foreach (\Anemon::from(\Block::get())->sort([1, 'stack'], true) as $k => $v) {
-        $content = \Block::replace($k, $v['fn'], $content);
+    foreach ((new \Anemon(\Block::get()))->sort([1, 'stack'], true) as $k => $v) {
+        $content = \Block::alter($k, $v['fn'], $content);
     }
     return $content;
 }

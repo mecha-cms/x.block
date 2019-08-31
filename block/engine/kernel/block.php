@@ -13,14 +13,7 @@ final class Block extends SGML {
 
     public static $config = self::config;
 
-    public static function get(string $id = null) {
-        if (isset($id)) {
-            return self::$block[1][$id] ?? null;
-        }
-        return self::$block[1] ?? [];
-    }
-
-    public static function replace(string $id, $fn, string $content) {
+    public static function alter(string $id, $fn, string $content) {
         $c = static::$config;
         $open = $c[0][0]; // `[[`
         $close = $c[0][1]; // `]]`
@@ -79,6 +72,13 @@ final class Block extends SGML {
             }
         }
         return $content;
+    }
+
+    public static function get(string $id = null) {
+        if (isset($id)) {
+            return self::$block[1][$id] ?? null;
+        }
+        return self::$block[1] ?? [];
     }
 
     public static function let(string $id = null) {
