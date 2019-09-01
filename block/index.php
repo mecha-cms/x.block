@@ -1,5 +1,7 @@
 <?php namespace _\lot\x;
 
+require __DIR__ . \DS . 'engine' . \DS . 'r' . \DS . 'language.php';
+
 if ($state = \state('block')) {
     \Block::$config = \extend(\Block::$config, (array) $state);
 }
