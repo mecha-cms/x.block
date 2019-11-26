@@ -1,18 +1,16 @@
 <?php namespace _\lot\x;
 
-require __DIR__ . \DS . 'engine' . \DS . 'r' . \DS . 'language.php';
-
-if ($state = \state('block')) {
-    \Block::$config = \extend(\Block::$config, (array) $state);
+if ($state = \State::get('x.block', true)) {
+    \Block::$state = \array_replace_recursive(\Block::$state, (array) $state);
 }
 
 function block($content) {
-    $c = \Block::$config;
+    $c = \Block::$state;
     // No `[[` character(s) found, skip anyway…
-    if (\strpos($content, $c[0][0]) === false) {
+    if (false === \strpos($content, $c[0][0])) {
         return $content;
     }
-    foreach (\g(\BLOCK, 'data') as $k => $v) {
+    foreach (\g(\LOT . \DS . 'block', 'data') as $k => $v) {
         $content = \Block::alter($n = \Path::N($k), function($a, $b) use($n, $k) {
             $data = [
                 0 => $n,
@@ -35,9 +33,10 @@ function block($content) {
 
 \Hook::set([
     'page.content',
-    'page.css',
+    'page.css', // `.\lot\x\art`
     'page.description',
-    'page.image',
-    'page.js',
+    'page.excerpt', // `.\lot\x\excerpt`
+    'page.image', // `.\lot\x\image`
+    'page.js', // `.\lot\x\art`
     'page.link'
 ], __NAMESPACE__ . "\\block", 1);

@@ -2,7 +2,7 @@
 
 final class Block extends SGML {
 
-    const config = [
+    const state = [
         0 => ['[[', ']]', '/'],
         1 => ['"', '"', '=']
     ];
@@ -11,10 +11,10 @@ final class Block extends SGML {
 
     public $strict = false;
 
-    public static $config = self::config;
+    public static $state = self::state;
 
     public static function alter(string $id, $fn, string $content) {
-        $c = static::$config;
+        $c = static::$state;
         $open = $c[0][0]; // `[[`
         $close = $c[0][1]; // `]]`
         $end = $c[0][2]; // `/`
@@ -29,21 +29,21 @@ final class Block extends SGML {
             };
         }
         // No `[[` character(s) found, skip anyway…
-        if (strpos($content, $open) === false) {
+        if (false === strpos($content, $open)) {
             return $content;
         }
         // No `[[id]]`, `[[id/]]`, `[[id /]]` and `[[id ` character(s) found, skip…
         if (
-            strpos($content, $open . $id . $close) === false &&
-            strpos($content, $open . $id . $end . $close) === false &&
-            strpos($content, $open . $id . ' ' . $end . $close) === false &&
-            strpos($content, $open . $id . ' ') === false
+            false === strpos($content, $open . $id . $close) &&
+            false === strpos($content, $open . $id . $end . $close) &&
+            false === strpos($content, $open . $id . ' ' . $end . $close) &&
+            false === strpos($content, $open . $id . ' ')
         ) {
             return $content;
         }
         // Prioritize container block(s) over void block(s)
         // Check for `[[/id]]` character(s)…
-        if (strpos($content, $open . $end . $id . $close) !== false) {
+        if (false !== strpos($content, $open . $end . $id . $close)) {
             // `[[id]]content[[/id]]`
             $content = preg_replace_callback('/' . $open_x . $id_x . '(?:[ ][^' . $close_x . ']*)?(?:' . $end_x . $close_x . '|' . $close_x . '(?:(?:[\s\S](?!' . $open_x . $id_x . '(?: |' . $close_x . ')))*?' . $open_x . $end_x . $id_x . $close_x . ')?)/', function($m) use($fn) {
                 $data = new static($m[0]);
@@ -52,10 +52,10 @@ final class Block extends SGML {
         }
         // Check for `[[id` character(s) after doing the previous parsing process;
         // If the character(s) still exists, it means we may have some void block(s)…
-        if (strpos($content, $open . $id) !== false) {
+        if (false !== strpos($content, $open . $id)) {
             // Check for `[[id ` character(s); If the character(s) still exists,
             // then we may have some void block(s) with attribute(s) in it…
-            if (strpos($content, $open . $id . ' ') !== false) {
+            if (false !== strpos($content, $open . $id . ' ')) {
                 // `[[id foo="bar"]]` or `[[id foo="bar"/]]`
                 $content = preg_replace_callback('/' . $open_x . $id_x . '([ ].*?)?[ ]*' . $end_x . '?' . $close_x . '/', function($m) use($fn) {
                     $data = new static($m[0]);
@@ -86,7 +86,7 @@ final class Block extends SGML {
             self::$block[0][$id] = 1;
             unset(self::$block[1][$id]);
         } else {
-            self::$block = [];
+            self::$block[1] = [];
         }
     }
 
