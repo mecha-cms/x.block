@@ -4,6 +4,10 @@ Block Extension for Mecha
 Release Notes
 -------------
 
+### 1.7.3
+
+ - Make block example becomes copy-paste friendly.
+
 ### 1.7.2
 
  - Added ability to define block data as a file stored in `.\lot\block` folder.

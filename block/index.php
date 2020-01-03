@@ -20,7 +20,7 @@ function block($content) {
             $data[2] = \json_encode($data[2]);
             $content = \file_get_contents($k);
             foreach (\array_replace($data, $b) as $k => $v) {
-                $content = \str_replace('%' . $k, $v, $content);
+                $content = \strtr($content, ['%' . $k => $v]);
             }
             return $content;
         }, $content);
@@ -35,8 +35,6 @@ function block($content) {
     'page.content',
     'page.css', // `.\lot\x\art`
     'page.description',
-    'page.excerpt', // `.\lot\x\excerpt`
-    'page.image', // `.\lot\x\image`
     'page.js', // `.\lot\x\art`
     'page.link'
 ], __NAMESPACE__ . "\\block", 1);
