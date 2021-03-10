@@ -1,4 +1,4 @@
-<?php namespace _\lot\x;
+<?php namespace x;
 
 if ($state = \State::get('x.block', true)) {
     \Block::$state = \array_replace_recursive(\Block::$state, (array) $state);
