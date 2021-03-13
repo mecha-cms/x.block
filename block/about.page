@@ -6,7 +6,7 @@ type: Markdown
 version: 1.8.0
 ...
 
-Block is a kind of placeholder that can be embedded within the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern then will be converted into something else.
+Block is a kind of placeholder that can be embedded within the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern then can be converted into something else.
 
 By default, a block syntax can be defined as follow. It uses <code>&#x5B;&#x5B;</code> and <code>&#x5D;&#x5D;</code> as the enclosing characters:
 
@@ -144,7 +144,7 @@ The code above will change this `$content` value:
 
 #### Using Files
 
-Block names can be defined as a plain text file with extension `data` stored in `.\lot\block` folder. Each file name acts as the block name, while the file content acts as a substitution value for the block.
+Block name can be defined as plain text file with extension `data` stored in `.\lot\block` folder. Each file name acts as the block name, while the file content acts as a substitution value for the block.
 
 ~~~ .txt
 .\
@@ -156,11 +156,11 @@ Block names can be defined as a plain text file with extension `data` stored in 
 
 The following is an example of the `mark.data` file content:
 
-<pre><code class="txt">&lt;mark style="background: &#x25;color;"&gt;&#x25;1&lt;/mark&gt;</code></pre>
+<pre><code class="txt">&lt;mark style="background: &#x25;color;"&gt;&#x25;&#x31;&lt;/mark&gt;</code></pre>
 
-The <code>&#x25;1</code> pattern is a parameter that will be converted into any text that is inside the container block markup. Some other parameters include:
+The <code>&#x25;&#x31;</code> pattern is a parameter that will be converted into any text that is inside the container block markup. Some other parameters include:
 
- - <code>&#x25;0</code> → Return the block name.
- - <code>&#x25;1</code> → Return the block content.
- - <code>&#x25;2</code> → Return the block attributes as literal JSON.
+ - <code>&#x25;&#x30;</code> → Return the block name.
+ - <code>&#x25;&#x31;</code> → Return the block content.
+ - <code>&#x25;&#x32;</code> → Return the block attributes as literal JSON.
  - <code>&#x25;color</code> → Return the block’s `color` attribute value.
