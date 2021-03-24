@@ -4,7 +4,7 @@ Block Extension for Mecha
 Release Notes
 -------------
 
-### main
+### 1.8.0
 
  - [@mecha-cms/mecha#96](https://github.com/mecha-cms/mecha/issues/96)
 
