@@ -1,7 +1,7 @@
 <?php namespace x;
 
-if ($state = \State::get('x.block', true)) {
-    \Block::$state = \array_replace_recursive(\Block::$state, (array) $state);
+if (isset($state->x->block)) {
+    \Block::$state = \array_replace_recursive(\Block::$state, (array) \a($state->x->block));
 }
 
 function block($content) {
