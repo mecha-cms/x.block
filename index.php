@@ -1,40 +1,89 @@
-<?php namespace x;
+<?php
 
-if (isset($state->x->block)) {
-    \Block::$state = \array_replace_recursive(\Block::$state, (array) \a($state->x->block));
-}
-
-function block($content) {
-    $c = \Block::$state;
-    // No `[[` character(s) found, skip anyway…
-    if (false === \strpos($content, $c[0][0])) {
-        return $content;
-    }
-    foreach (\g(\LOT . \DS . 'block', 'data') as $k => $v) {
-        $content = \Block::alter($n = \Path::N($k), function($a, $b) use($n, $k) {
-            $data = [
-                0 => $n,
-                1 => $a,
-                2 => $b
-            ];
-            $data[2] = \json_encode($data[2]);
-            $content = \file_get_contents($k);
-            foreach (\array_replace($data, $b) as $k => $v) {
-                $content = \strtr($content, ['%' . $k => $v]);
-            }
+namespace x {
+    function block($content) {
+        // Content is empty or does not contain `[[` token(s), skip!
+        if (!$content || false === \strpos($content, '[[')) {
             return $content;
+        }
+        $that = $this;
+        return \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\/\]])*)?(?:\]\]((?:(?R)|[\s\S])*?)\[\[\/(\1)\]\]|\/\]\])/', static function ($m) use ($that) {
+            $out = [
+                0 => $m[1],
+                1 => isset($m[4]) ? \x\block\shift($m[3]) : false,
+                2 => []
+            ];
+            if (isset($m[2]) && \preg_match_all('/\s+([^\s"\'\/=\[\]]+)(?:=("(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\s\/\]]*))?/', $m[2], $mm)) {
+                if (!empty($mm[1])) {
+                    foreach ($mm[1] as $i => $k) {
+                        $v = $mm[2][$i];
+                        $v = \strtr(0 === \strpos($v, '"') && '"' === \substr($v, -1) || 0 === \strpos($v, "'") && "'" === \substr($v, -1) ? \substr($v, 1, -1) : $v, [
+                            '\\"' => '"',
+                            '\\\'' => "'"
+                        ]);
+                        $out[2][$k] = $v === $k || isset($mm[0][$i]) && false === \strpos($mm[0][$i], '=') ? true : $v;
+                    }
+                }
+            }
+            // Use the named block hook if available …
+            if (\Hook::get('block.' . $out[0])) {
+                if (\is_string($out[1]) && false !== \strpos($out[1], '[[')) {
+                    $out[1] = \fire(__NAMESPACE__ . "\\block", [$out[1]], $that); // Recurse!
+                }
+                return \Hook::fire('block.' . $out[0], [$m[0], $out], $that);
+            }
+            // … or use the unnamed block hook if available …
+            if (\Hook::get('block')) {
+                if (\is_string($out[1]) && false !== \strpos($out[1], '[[')) {
+                    $out[1] = \fire(__NAMESPACE__ . "\\block", [$out[1]], $that); // Recurse!
+                }
+                return \Hook::fire('block', [$m[0], $out], $that);
+            }
+            // … or else, return the block syntax!
+            return $m[0];
         }, $content);
     }
-    foreach ((new \Anemon(\Block::get()))->sort([1, 'stack'], true) as $k => $v) {
-        $content = \Block::alter($k, $v['fn'], $content);
-    }
-    return $content;
+    \Hook::set([
+        'page.content',
+        'page.css', // `.\lot\x\art`
+        'page.description',
+        'page.js', // `.\lot\x\art`
+        'page.title'
+    ], __NAMESPACE__ . "\\block", 1);
 }
 
-\Hook::set([
-    'page.content',
-    'page.css', // `.\lot\x\art`
-    'page.description',
-    'page.js', // `.\lot\x\art`
-    'page.link'
-], __NAMESPACE__ . "\\block", 1);
+namespace x\block {
+    function shift($content) {
+        $content = \rtrim(\trim($content, "\n"));
+        if (\preg_match('/^[ \t]+/', $content, $m)) {
+            $out = "";
+            foreach (\explode("\n", $content) as $v) {
+                if (0 === \strpos($v, $m[0])) {
+                    $out .= \substr($v, \strlen($m[0])) . "\n";
+                    continue;
+                }
+                $out .= $v . "\n";
+            }
+            return \substr($out, 0, -1);
+        }
+        return $content;
+    }
+    if (\defined("\\TEST") && 'x.block' === \TEST) {
+        require __DIR__ . \D . 'test.php';
+    }
+    if (\is_dir($folder = \LOT . \D . 'block')) {
+        foreach (\g($folder, 'php') as $k => $v) {
+            if (!\Hook::get('block.' . ($n = \basename($k, '.php')))) {
+                (static function ($k) use ($n) {
+                    \extract($GLOBALS, \EXTR_SKIP);
+                    if (!\is_callable($fn = require $k)) {
+                        $fn = function () use ($fn) {
+                            return $fn;
+                        };
+                    }
+                    \Hook::set('block.' . $n, $fn, 10);
+                })($k);
+            }
+        }
+    }
+}

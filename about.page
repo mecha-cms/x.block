@@ -1,166 +1,91 @@
 ---
 title: Block
-description: Placeholder.
+description: Placement system.
+icon: 'M2,4C2,2.89 2.9,2 4,2H7V4H4V7H2V4M22,4V7H20V4H17V2H20A2,2 0 0,1 22,4M20,20V17H22V20C22,21.11 21.1,22 20,22H17V20H20M2,20V17H4V20H7V22H4A2,2 0 0,1 2,20M10,2H14V4H10V2M10,20H14V22H10V20M20,10H22V14H20V10M2,10H4V14H2V10Z'
 author: Taufik Nurrohman
 type: Markdown
-version: 1.8.0
+version: 2.0.0
+
+use:
+  '.\lot\x\page': 0
 ...
 
-Block is a kind of placeholder that can be embedded within the page content which normally can be written like HTML code in general, but with custom enclosing characters. Each block pattern then can be converted into something else.
+Block is a placement system that can be implemented in places where it is not possible to safely parse server-side language syntax directly such as within the page content. It normally can be written just like normal HTML elements in general, but with custom enclosing characters. Each block can then be converted into something else via server-side language.
 
-By default, a block syntax can be defined as follow. It uses <code>&#x5B;&#x5B;</code> and <code>&#x5D;&#x5D;</code> as the enclosing characters:
+We no longer recommend you to use the block feature. There are many other alternatives which can provide backward compatible solutions such as by using HTML comments or [Emoji](https://en.wikipedia.org/wiki/Emoji) characters, in the hope that when you decide to no longer use certain block features in the future, your content data will still be comfortable to consume since there are no more raw block elements appearing in the page content. This can minimize the need for page maintenance especially the old ones that you no longer want to touch.
+
+The purpose of maintaining this extension is to demonstrate that Mecha has the capability to provide this kind of feature. This does not mean that you should use it.
+
+By default, a block syntax can be represented as follows. It uses <code>&#x5B;&#x5B;</code> and <code>&#x5D;&#x5D;</code> as the enclosing characters:
 
  - Void blocks → <code>&#x5B;&#x5B;block&#x5D;&#x5D;</code> or <code>&#x5B;&#x5B;block/&#x5D;&#x5D;</code>
  - Container blocks → <code>&#x5B;&#x5B;block&#x5D;&#x5D;content&#x5B;&#x5B;/block&#x5D;&#x5D;</code>
 
-Block attribute syntax is the same as the attribute syntax in HTML.
+Block attribute syntax is the same as HTML attribute syntax.
 
-Blocks are configurable. Even, you can specify your own block markup by editing the configuration file:
+### Using Files
 
-<pre><code class="php">[
-    0 =&gt; ['&#x5B;&#x5B;', '&#x5D;&#x5D;', '/'],
-    1 =&gt; ['"', '"', '=']
-]</code></pre>
-
- - The `0` parts are configuration for the block tag.
- - The `1` parts are configuration for the block tag’s attribute.
-
-Following is an example of configuring block pattern as regular HTML (custom HTML tags):
-
-<pre><code class="xmp txt">&lt;block&gt;content&lt;/block&gt;</code></pre>
-
-<pre><code class="php">[
-    0 =&gt; ['&lt;', '&gt;', '/'],
-    1 =&gt; ['"', '"', '=']
-]</code></pre>
-
-As [WordPress](https://developer.wordpress.org/reference/functions/do_shortcode "do_shortcode() | Function | WordPress Developer Resources") _shortcodes_:
-
-<pre><code class="xmp txt">&#x5B;block&#x5D;content&#x5B;/block&#x5D;</code></pre>
-
-<pre><code class="php">[
-    0 =&gt; ['&#x5B;', '&#x5D;', '/'],
-    1 =&gt; ['"', '"', '=']
-]</code></pre>
-
-As [Twig](http://twig.sensiolabs.org/doc/tags/embed.html "embed - Documentation - Twig - The flexible, fast, and secure PHP template engine") embed code:
-
-<pre><code class="xmp txt">&#x7B;% block %&#x7D;content&#x7B;% endblock %&#x7D;</code></pre>
-
-<pre><code class="php">[
-    0 =&gt; ['&#x7B;% ', ' %&#x7D;', 'end'],
-    1 =&gt; ['"', '"', '=']
-]</code></pre>
-
-As of Mecha version `1.x.x` _shortcodes_:
-
-<pre><code class="xmp php">&#x7B;&#x7B;block&#x7D;&#x7D;content&#x7B;&#x7B;/block&#x7D;&#x7D;</code></pre>
-
-<pre><code class="php">[
-    0 =&gt; ['&#x7B;&#x7B;', '&#x7D;&#x7D;', '/'],
-    1 =&gt; ['"', '"', '=']
-]</code></pre>
-
----
-
-### Usage
-
-#### Set
-
-~~~ .xmp.php
-Block::set(string $id, callable $fn, float $stack = 10);
-Block::set(string $id, string $value, float $stack = 10);
-~~~
-
-Define a new block:
-
-~~~ .php
-Block::set('mark', function($content) {
-    return '<mark>' . $content . '</mark>';
-});
-~~~
-
-The code above will change this page content:
-
-<pre><code class="html">Lorem ipsum &#x5B;&#x5B;mark&#x5D;&#x5D;dolor&#x5B;&#x5B;/mark&#x5D;&#x5D; sit amet.</code></pre>
-
-… to this:
-
-<pre><code class="html">Lorem ipsum &lt;mark&gt;dolor&lt;/mark&gt; sit amet.</code></pre>
-
-#### Get
-
-~~~ .xmp.php
-Block::get(string $id = null);
-~~~
-
-Return the `mark` block data if any, otherwise, return `null` or empty array:
-
-~~~ .php
-if ($data = Block::get('mark')) {
-    // Do something with `$data`…
-    return call_user_func($data['fn'], $content);
-}
-~~~
-
-#### Let
-
-~~~ .xmp.php
-Block::let(string $id = null);
-~~~
-
-Disable the `mark` block pattern:
-
-~~~ .php
-Block::let('mark');
-~~~
-
-#### Alter
-
-~~~ .xmp.php
-Block::alter(string $id, callable $fn, string $content);
-Block::alter(string $id, string $value, string $content);
-~~~
-
-Replace `mark` block in `$content` with advance pattern:
-
-~~~ .php
-$content = Block::alter('mark', function($a, $b) {
-    $c = "";
-    if (isset($b['color'])) {
-        $c = ' style="background: ' . $b['color'] . ';"';
-    }
-    return '<mark' . $c . '>' . $a . '</mark>';
-}, $content);
-~~~
-
-The code above will change this `$content` value:
-
-<pre><code class="html">Lorem &#x5B;&#x5B;mark&#x5D;&#x5D;ipsum&#x5B;&#x5B;/mark&#x5D;&#x5D; &#x5B;&#x5B;mark color="#f00"&#x5D;&#x5D;dolor&#x5B;&#x5B;/mark&#x5D;&#x5D; sit amet.</code></pre>
-
-… to this:
-
-<pre><code class="html">Lorem &lt;mark&gt;ipsum&lt;/mark&gt; &lt;mark style="background: #f00;"&gt;dolor&lt;/mark&gt; sit amet.</code></pre>
-
-#### Using Files
-
-Block name can be defined as plain text file with extension `data` stored in `.\lot\block` folder. Each file name acts as the block name, while the file content acts as a substitution value for the block.
+Blocks can be defined via PHP files stored in `.\lot\block` folder. Each file name acts as the block name, while the file content acts as the substitution value for the block.
 
 ~~~ .txt
 .\
 └── lot\
     └── block\
-        ├── mark.data
+        ├── asset.php
+        ├── mark.php
         └── …
 ~~~
 
-The following is an example of the `mark.data` file content:
+You can return a literal value if the given block is simple, for example, to provide an asset URL. The following is an example of the `asset.php` file content:
 
-<pre><code class="txt">&lt;mark style="background: &#x25;color;"&gt;&#x25;&#x31;&lt;/mark&gt;</code></pre>
+~~~ .php
+<?php return $url . '/lot/asset';
+~~~
 
-The <code>&#x25;&#x31;</code> pattern is a parameter that will be converted into any text that is inside the container block markup. Some other parameters include:
+For more complex data, I suggest you to return a callable function. The following is an example of the `mark.php` file content:
 
- - <code>&#x25;&#x30;</code> → Return the block name.
- - <code>&#x25;&#x31;</code> → Return the block content.
- - <code>&#x25;&#x32;</code> → Return the block attributes as literal JSON.
- - <code>&#x25;color</code> → Return the block’s `color` attribute value.
+~~~ .php
+<?php
+
+// NOTE: In this closure, `$this` refers to the current `$page` variable
+return function ($content, $data) {
+    // Convert array into HTML attribute(s)
+    $attributes = "";
+    foreach ($data[2] as $k => $v) {
+        if (true === $v) {
+            // Value-less attribute such as `checked`, `disabled`
+            $attributes .= ' ' . $k;
+        } else {
+            // Make sure to escape the value, just in case there&rsquo;s a `"` in it
+            $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
+        }
+    }
+    // If `$data[1]` is `false`, then the block must be void!
+    if (false === $data[1]) {
+        return '<mark' . $attributes . '/>';
+    }
+    return '<mark' . $attributes . '>' . $data[1] . '</mark>';
+};
+~~~
+
+### Using Hooks
+
+By using hooks, other extensions can add their own block features without having to add the block files into `.\lot\block` folder. Whenever there is a block syntax in the page content, its syntax will be automatically hit by a hook named `block.*` where `*` is the block name. It will return the value as-is when the hook data associated with the block name is empty. Adding a block hook will automatically disable the same block hook added via PHP files.
+
+~~~ php
+// This hook will disable the hook declared in `.\lot\block\mark.php` file
+Hook::set('block.mark', function ($content, $data) {
+    $attributes = "";
+    foreach ($data[2] as $k => $v) {
+        if (true === $v) {
+            $attributes .= ' ' . $k;
+        } else {
+            $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
+        }
+    }
+    if (false === $data[1]) {
+        return '<mark' . $attributes . '/>';
+    }
+    return '<mark' . $attributes . '>' . $data[1] . '</mark>';
+}); // → the stack value is `10` by default
+~~~

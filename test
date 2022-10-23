@@ -1,0 +1,46 @@
+aaa aaa aaa
+aaa aaa aaa
+
+aaa aaa aaa
+
+[[aaa/]] [[aaa /]]
+
+aaa aaa aaa
+
+[[aaa bbb=ccc/]] [[aaa bbb=ccc/]]
+[[aaa bbb='ccc'/]] [[aaa bbb='ccc'/]]
+[[aaa bbb="ccc"/]] [[aaa bbb="ccc"/]]
+
+[[aaa bbb="bbb" ccc="ccc"/]] [[aaa bbb="bbb" ccc="ccc"/]]
+[[aaa bbb ccc/]] [[aaa bbb ccc/]]
+
+aaa aaa aaa
+
+[[aaa]]bbb[[/aaa]]
+
+[[aaa bbb="ccc"]]ddd[[/aaa]]
+
+[[bbb ccc="ddd"]]eee[[/bbb]]
+
+aaa aaa aaa
+
+[[list]]
+  [[list-item]]list item 1[[/list-item]]
+  [[list-item]]list item 2[[/list-item]]
+  [[list-item]]
+    list item 3
+    [[list]]
+      [[list-item]]list item 3.1[[/list-item]]
+      [[list-item]]list item 3.2[[/list-item]]
+      [[list-item]]list item 3.3[[/list-item]]
+    [[/list]]
+  [[/list-item]]
+  [[list-item]]list item 4[[/list-item]]
+  [[list-item]]
+    list item 5
+  [[/list-item]]
+[[/list]]
+
+aaa aaa aaa
+
+[[list-item]]list item with no `list` parent[[/list-item]]
