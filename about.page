@@ -56,7 +56,7 @@ return function ($content, $data) {
             // Value-less attribute such as `checked`, `disabled`
             $attributes .= ' ' . $k;
         } else {
-            // Make sure to escape the value, just in case there&rsquo;s a `"` in it
+            // Make sure to escape the value, just in case there’s a `"` in it
             $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
         }
     }
