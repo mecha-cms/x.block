@@ -7,7 +7,7 @@ namespace x {
             return $content;
         }
         $that = $this;
-        return \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\/\]])*)?(?:\]\]((?:(?R)|[\s\S])*?)\[\[\/(\1)\]\]|\/\]\])/', static function ($m) use ($that) {
+        $r = static function ($m) use ($that) {
             $out = [
                 0 => $m[1],
                 1 => isset($m[4]) ? \x\block\shift($m[3]) : false,
@@ -41,7 +41,18 @@ namespace x {
             }
             // … or else, return the block syntax!
             return $m[0];
-        }, $content);
+        };
+        // Prioritize container block(s) over void block(s)
+        // First, try to capture `[[asdf]]asdf[[/asdf]]`, then try to capture `[[asdf/]]`
+        $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\/\]])*)?(?:\]\]((?:(?R)|[\s\S])*?)\[\[\/(\1)\]\]|\/\]\])/', $r, $content);
+
+        // Check for `[[` character(s) again after the previous capture(s);
+        // If the character(s) still exists, we may have some void block(s)…
+        if (false !== \strpos($content, '[[')) {
+            // Try to capture `[[asdf]]`
+            $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\]])*)?\]\]/', $r, $content);
+        }
+        return $content;
     }
     \Hook::set([
         'page.content',

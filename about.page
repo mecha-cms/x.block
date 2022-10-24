@@ -72,7 +72,7 @@ return function ($content, $data) {
 
 By using hooks, other extensions can add their own block features without having to add the block files into `.\lot\block` folder. Whenever there is a block syntax in the page content, its syntax will be automatically hit by a hook named `block.*` where `*` is the block name. It will return the value as-is when the hook data associated with the block name is empty. Adding a block hook will automatically disable the same block hook added via PHP files.
 
-~~~ php
+~~~ .php
 // This hook will disable the hook declared in `.\lot\block\mark.php` file
 Hook::set('block.mark', function ($content, $data) {
     $attributes = "";
@@ -87,5 +87,5 @@ Hook::set('block.mark', function ($content, $data) {
         return '<mark' . $attributes . '/>';
     }
     return '<mark' . $attributes . '>' . $data[1] . '</mark>';
-}); // → the stack value is `10` by default
+});
 ~~~
