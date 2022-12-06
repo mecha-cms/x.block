@@ -18,8 +18,8 @@ The purpose of maintaining this extension is to demonstrate that Mecha has the c
 
 By default, a block syntax can be represented as follows. It uses <code>&#x5B;&#x5B;</code> and <code>&#x5D;&#x5D;</code> as the enclosing characters:
 
- - Void blocks → <code>&#x5B;&#x5B;block&#x5D;&#x5D;</code> or <code>&#x5B;&#x5B;block/&#x5D;&#x5D;</code>
- - Container blocks → <code>&#x5B;&#x5B;block&#x5D;&#x5D;content&#x5B;&#x5B;/block&#x5D;&#x5D;</code>
+ - Void blocks → <code>&#x5b;&#x5b;block&#x5d;&#x5d;</code> or <code>&#x5b;&#x5b;block/&#x5d;&#x5d;</code>
+ - Container blocks → <code>&#x5b;&#x5b;block&#x5d;&#x5d;content&#x5b;&#x5b;/block&#x5d;&#x5d;</code>
 
 Block attribute syntax is the same as HTML attribute syntax.
 
