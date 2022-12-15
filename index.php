@@ -79,8 +79,8 @@ namespace x\block {
         }
         return $content;
     }
-    if (\defined("\\TEST") && 'x.block' === \TEST) {
-        require __DIR__ . \D . 'test.php';
+    if (\defined("\\TEST") && 'x.block' === \TEST && \is_file($test = __DIR__ . \D . 'test.php')) {
+        require $test;
     }
     if (\is_dir($folder = \LOT . \D . 'block')) {
         foreach (\g($folder, 'php') as $k => $v) {
