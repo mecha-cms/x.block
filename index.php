@@ -56,9 +56,9 @@ namespace x {
     }
     \Hook::set([
         'page.content',
-        'page.css', // `.\lot\x\art`
         'page.description',
-        'page.js', // `.\lot\x\art`
+        'page.script', // `.\lot\x\art`
+        'page.style', // `.\lot\x\art`
         'page.title'
     ], __NAMESPACE__ . "\\block", 1);
 }
