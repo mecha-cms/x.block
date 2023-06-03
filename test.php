@@ -1,6 +1,6 @@
 <?php
 
-$content = file_get_contents(__DIR__ . D . 'test');
+$content = file_get_contents(__DIR__ . D . 'test.txt');
 
 if (array_key_exists('hook', $_GET)) {
     $hook = $_GET['hook'];
