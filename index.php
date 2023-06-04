@@ -1,7 +1,7 @@
 <?php
 
-namespace x {
-    function block($content) {
+namespace x\block\page {
+    function content($content) {
         // Content is empty or does not contain `[[` token(s), skip!
         if (!$content || false === \strpos($content, '[[')) {
             return $content;
@@ -28,14 +28,14 @@ namespace x {
             // Use the named block hook if available …
             if (\Hook::get('block.' . $out[0])) {
                 if (\is_string($out[1]) && false !== \strpos($out[1], '[[')) {
-                    $out[1] = \fire(__NAMESPACE__ . "\\block", [$out[1]], $that); // Recurse!
+                    $out[1] = \fire(__NAMESPACE__ . "\\content", [$out[1]], $that); // Recurse!
                 }
                 return \Hook::fire('block.' . $out[0], [$m[0], $out], $that);
             }
             // … or use the unnamed block hook if available …
             if (\Hook::get('block')) {
                 if (\is_string($out[1]) && false !== \strpos($out[1], '[[')) {
-                    $out[1] = \fire(__NAMESPACE__ . "\\block", [$out[1]], $that); // Recurse!
+                    $out[1] = \fire(__NAMESPACE__ . "\\content", [$out[1]], $that); // Recurse!
                 }
                 return \Hook::fire('block', [$m[0], $out], $that);
             }
@@ -54,13 +54,23 @@ namespace x {
         }
         return $content;
     }
-    \Hook::set([
-        'page.content',
-        'page.description',
-        'page.script', // `.\lot\x\art`
-        'page.style', // `.\lot\x\art`
-        'page.title'
-    ], __NAMESPACE__ . "\\block", 1);
+    function description($description) {
+        return \fire(__NAMESPACE__ . "\\content", [$description], $this);
+    }
+    function script($script) {
+        return \fire(__NAMESPACE__ . "\\content", [$script], $this);
+    }
+    function style($style) {
+        return \fire(__NAMESPACE__ . "\\content", [$style], $this);
+    }
+    function title($title) {
+        return \fire(__NAMESPACE__ . "\\content", [$title], $this);
+    }
+    \Hook::set('page.content', __NAMESPACE__ . "\\content", 1);
+    \Hook::set('page.description', __NAMESPACE__ . "\\description", 1);
+    \Hook::set('page.script', __NAMESPACE__ . "\\script", 1); // `.\lot\x\art`
+    \Hook::set('page.style', __NAMESPACE__ . "\\style", 1); // `.\lot\x\art`
+    \Hook::set('page.title', __NAMESPACE__ . "\\title", 1);
 }
 
 namespace x\block {
@@ -79,6 +89,9 @@ namespace x\block {
         }
         return $content;
     }
+}
+
+namespace {
     if (\is_dir($folder = \LOT . \D . 'block')) {
         foreach (\g($folder, 'php') as $k => $v) {
             if (!\Hook::get('block.' . ($n = \basename($k, '.php')))) {
