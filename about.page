@@ -58,10 +58,10 @@ content:
 <?php
 
 // NOTE: In this closure, `$this` refers to the current `$page` variable
-return function ($content, $data) {
+return function ($content, $lot) {
     // Convert array into HTML attribute(s)
     $attributes = "";
-    foreach ($data[2] as $k => $v) {
+    foreach ($lot[2] as $k => $v) {
         if (true === $v) {
             // Value-less attribute such as `checked`, `disabled`
             $attributes .= ' ' . $k;
@@ -70,11 +70,11 @@ return function ($content, $data) {
             $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
         }
     }
-    // If `$data[1]` is `false`, then the block must be void!
-    if (false === $data[1]) {
+    // If `$lot[1]` is `false`, then the block must be void!
+    if (false === $lot[1]) {
         return '<mark' . $attributes . '/>';
     }
-    return '<mark' . $attributes . '>' . $data[1] . '</mark>';
+    return '<mark' . $attributes . '>' . $lot[1] . '</mark>';
 };
 ~~~
 
@@ -87,18 +87,18 @@ block name is empty. Adding a block hook will automatically disable the same blo
 
 ~~~ .php
 // This hook will disable the hook declared in `.\lot\block\mark.php` file
-Hook::set('block.mark', function ($content, $data) {
+Hook::set('block.mark', function ($content, $lot) {
     $attributes = "";
-    foreach ($data[2] as $k => $v) {
+    foreach ($lot[2] as $k => $v) {
         if (true === $v) {
             $attributes .= ' ' . $k;
         } else {
             $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
         }
     }
-    if (false === $data[1]) {
+    if (false === $lot[1]) {
         return '<mark' . $attributes . '/>';
     }
-    return '<mark' . $attributes . '>' . $data[1] . '</mark>';
+    return '<mark' . $attributes . '>' . $lot[1] . '</mark>';
 });
 ~~~

@@ -7,18 +7,18 @@ if (array_key_exists('hook', $_GET)) {
     if (!empty($hook)) {
         if (is_array($hook)) {
             foreach ($hook as $v) {
-                Hook::set('block.' . $v, function ($content, $data) {
-                    return '<mark style="background:rgba(0,0,0,.125);border:1px solid;border-color:inherit;color:inherit;display:inline-block;margin:.25em;padding:.25em;" title="' . $data[0] . '">' . ($data[1] ?: '<em role="status">empty</em>') . '</mark>';
+                Hook::set('block.' . $v, function ($content, $lot) {
+                    return '<mark style="background:rgba(0,0,0,.125);border:1px solid;border-color:inherit;color:inherit;display:inline-block;margin:.25em;padding:.25em;" title="' . $lot[0] . '">' . ($lot[1] ?: '<em role="status">empty</em>') . '</mark>';
                 });
             }
         } else {
-            Hook::set('block.' . $hook, function ($content, $data) {
-                return '<mark style="background:rgba(0,0,0,.125);border:1px solid;border-color:inherit;color:inherit;display:inline-block;margin:.25em;padding:.25em;" title="' . $data[0] . '">' . ($data[1] ?: '<em role="status">empty</em>') . '</mark>';
+            Hook::set('block.' . $hook, function ($content, $lot) {
+                return '<mark style="background:rgba(0,0,0,.125);border:1px solid;border-color:inherit;color:inherit;display:inline-block;margin:.25em;padding:.25em;" title="' . $lot[0] . '">' . ($lot[1] ?: '<em role="status">empty</em>') . '</mark>';
             });
         }
     } else {
-        Hook::set('block', function ($content, $data) {
-            return '<mark style="background:rgba(0,0,0,.125);border:1px solid;border-color:inherit;color:inherit;display:inline-block;margin:.25em;padding:.25em;" title="' . $data[0] . '">' . ($data[1] ?: '<em role="status">empty</em>') . '</mark>';
+        Hook::set('block', function ($content, $lot) {
+            return '<mark style="background:rgba(0,0,0,.125);border:1px solid;border-color:inherit;color:inherit;display:inline-block;margin:.25em;padding:.25em;" title="' . $lot[0] . '">' . ($lot[1] ?: '<em role="status">empty</em>') . '</mark>';
         });
     }
 }
