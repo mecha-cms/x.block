@@ -9,15 +9,14 @@ version: 2.0.0
 ...
 
 Block is a placement system that can be implemented in places where it is not possible to safely parse server-side
-language syntax directly such as within the page content. It normally can be written just like normal HTML elements in
-general, but with custom enclosing characters. Each block can then be converted into something else via server-side
-language.
+language syntax directly, such as within the page content. It can usually be written just like normal HTML elements, but
+with custom enclosing characters. Each block can then be converted into something else via server-side language.
 
-We no longer recommend you to use the block feature. There are many other alternatives which can provide backward
-compatible solutions such as by using HTML comments or [Emoji](https://en.wikipedia.org/wiki/Emoji) characters, in the
-hope that when you decide to no longer use certain block features in the future, your content data will still be
-comfortable to consume since there are no more raw block elements appearing in the page content. This can minimize the
-need for page maintenance especially the old ones that you no longer want to touch.
+We no longer recommend the use of the block feature. There are many other alternatives that can provide
+backward-compatible solutions, such as using HTML comments or [Emoji](https://en.wikipedia.org/wiki/Emoji) characters,
+in the hope that if you decide to remove certain block features in the future, your content data will still be
+convenient to consume since raw block elements do not appear in the page content. This can minimize the need to maintain
+pages, especially the old ones that you no longer want to touch.
 
 The purpose of maintaining this extension is to demonstrate that Mecha has the capability to provide this kind of
 feature. This does not mean that you should use it.
@@ -32,8 +31,8 @@ Block attribute syntax is the same as HTML attribute syntax.
 
 ### Using Files
 
-Blocks can be defined via PHP files stored in `.\lot\block` folder. Each file name acts as the block name, while the
-file content acts as the substitution value for the block.
+Blocks can be defined by PHP files stored in the `.\lot\block` folder. Each file name acts as a block name, while the
+contents of the file act as a replacement value for the block:
 
 ~~~ .txt
 .\
@@ -57,9 +56,9 @@ content:
 ~~~ .php
 <?php
 
-// NOTE: In this closure, `$this` refers to the current `$page` variable
+// In this closure, `$this` refers to the current `$page` variable
 return function ($content, $lot) {
-    // Convert array into HTML attribute(s)
+    // Convert array to HTML attribute(s)
     $attributes = "";
     foreach ($lot[2] as $k => $v) {
         if (true === $v) {
@@ -67,7 +66,7 @@ return function ($content, $lot) {
             $attributes .= ' ' . $k;
         } else {
             // Make sure to escape the value, just in case there’s a `"` in it
-            $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
+            $attributes .= ' ' . $k . '="' . eat($v) . '"';
         }
     }
     // If `$lot[1]` is `false`, then the block must be void!
@@ -80,20 +79,20 @@ return function ($content, $lot) {
 
 ### Using Hooks
 
-By using hooks, other extensions can add their own block features without having to add the block files into
-`.\lot\block` folder. Whenever there is a block syntax in the page content, its syntax will be automatically hit by a
-hook named `block.*` where `*` is the block name. It will return the value as-is when the hook data associated with the
-block name is empty. Adding a block hook will automatically disable the same block hook added via PHP files.
+By using hooks, other extensions can add their own block features without having to add the block files to the
+`.\lot\block` folder. Whenever there is a block syntax in the page content, its syntax is automatically hit by a hook
+named `block.*`, where `*` is the block name. It will return the value as it is, if the hook data associated with the
+block name is empty. Adding a block hook automatically disables the same block hook added through PHP files:
 
 ~~~ .php
-// This hook will disable the hook declared in `.\lot\block\mark.php` file
+// This hook will disable the hook declared in the `.\lot\block\mark.php` file
 Hook::set('block.mark', function ($content, $lot) {
     $attributes = "";
     foreach ($lot[2] as $k => $v) {
         if (true === $v) {
             $attributes .= ' ' . $k;
         } else {
-            $attributes .= ' ' . $k . '="' . From::HTML($v) . '"';
+            $attributes .= ' ' . $k . '="' . eat($v) . '"';
         }
     }
     if (false === $lot[1]) {

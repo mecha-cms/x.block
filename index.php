@@ -31,21 +31,21 @@ function page__content($content) {
             }
             return \Hook::fire('block.' . $out[0], [$m[0], $out], $that);
         }
-        // … or use the unnamed block hook if available …
+        // … or use the un-named block hook if available …
         if (\Hook::get('block')) {
             if (\is_string($out[1]) && false !== \strpos($out[1], '[[')) {
                 $out[1] = \fire(__NAMESPACE__ . "\\page__content", [$out[1]], $that); // Recurse!
             }
             return \Hook::fire('block', [$m[0], $out], $that);
         }
-        // … or else, return the block syntax!
+        // … or else, return the block syntax as-is!
         return $m[0];
     };
-    // Prioritize container block(s) over void block(s)
-    // First, try to capture `[[asdf]]asdf[[/asdf]]`, then try to capture `[[asdf/]]`
+    // Prioritize container block(s) over void block(s). First, try to capture `[[asdf]]asdf[[/asdf]]`, then try to
+    // capture `[[asdf/]]`
     $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\/\]])*)?(?:\]\]((?:(?R)|[\s\S])*?)\[\[\/(\1)\]\]|\/\]\])/', $r, $content);
-    // Check for `[[` character(s) again after the previous capture(s);
-    // If the character(s) still exists, we may have some void block(s)…
+    // Check for `[[` character(s) again after the previous capture(s); If the character(s) still exists, we may have
+    // some void block(s)…
     if (false !== \strpos($content, '[[')) {
         // Try to capture `[[asdf]]`
         $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\]])*)?\]\]/', $r, $content);
