@@ -12,7 +12,7 @@ function page__content($content) {
             1 => isset($m[4]) ? \x\block\shift($m[3]) : false,
             2 => []
         ];
-        if (isset($m[2]) && \preg_match_all('/\s+([^\s"\'\/=\[\]]+)(?:=("(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\s\/\]]*))?/', $m[2], $mm)) {
+        if (isset($m[2]) && \preg_match_all('/\s+([^\s"\'\/=\[\]]+)(?>=("(?>[^"\\\]|\\\.)*"|\'(?>[^\'\\\]|\\\.)*\'|[^\s\/\]]*))?/', $m[2], $mm)) {
             if (!empty($mm[1])) {
                 foreach ($mm[1] as $i => $k) {
                     $v = $mm[2][$i];
@@ -43,12 +43,12 @@ function page__content($content) {
     };
     // Prioritize container block(s) over void block(s). First, try to capture `[[asdf]]asdf[[/asdf]]`, then try to
     // capture `[[asdf/]]`
-    $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\/\]])*)?(?:\]\]((?:(?R)|[\s\S])*?)\[\[\/(\1)\]\]|\/\]\])/', $r, $content);
+    $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?>"(?>[^"\\\]|\\\.)*"|\'(?>[^\'\\\]|\\\.)*\'|[^\/\]])*)?(?>\]\]((?>(?R)|[\s\S])*?)\[\[\/(\1)\]\]|\/\]\])/', $r, $content);
     // Check for `[[` character(s) again after the previous capture(s); If the character(s) still exists, we may have
     // some void block(s)…
     if (false !== \strpos($content, '[[')) {
         // Try to capture `[[asdf]]`
-        $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?:"(?:[^"\\\]|\\\.)*"|\'(?:[^\'\\\]|\\\.)*\'|[^\]])*)?\]\]/', $r, $content);
+        $content = \preg_replace_callback('/\[\[([^\s"\'\/=\[\]]+)(\s(?>"(?>[^"\\\]|\\\.)*"|\'(?>[^\'\\\]|\\\.)*\'|[^\]])*)?\]\]/', $r, $content);
     }
     return $content;
 }
