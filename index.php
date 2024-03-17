@@ -16,10 +16,12 @@ function page__content($content) {
             if (!empty($mm[1])) {
                 foreach ($mm[1] as $i => $k) {
                     $v = $mm[2][$i];
-                    $v = \strtr(0 === \strpos($v, '"') && '"' === \substr($v, -1) || 0 === \strpos($v, "'") && "'" === \substr($v, -1) ? \substr($v, 1, -1) : $v, [
-                        '\\"' => '"',
-                        '\\\'' => "'"
-                    ]);
+                    if (0 === \strpos($v, '"') && '"' === \substr($v, -1) || 0 === \strpos($v, "'") && "'" === \substr($v, -1)) {
+                        $v = \strtr(\substr($v, 1, -1), [
+                            '\\"' => '"',
+                            '\\\'' => "'"
+                        ]);
+                    }
                     $out[2][$k] = $v === $k || isset($mm[0][$i]) && false === \strpos($mm[0][$i], '=') ? true : $v;
                 }
             }
@@ -76,17 +78,12 @@ function page__title($title) {
 \Hook::set('page.title', __NAMESPACE__ . "\\page__title", 1);
 
 function shift($content) {
+    $content = \strtr($content, ["\t" => \str_repeat(' ', 4)]);
     $content = \rtrim(\trim($content, "\n"));
-    if (\preg_match('/^[ \t]+/', $content, $m)) {
-        $out = "";
-        foreach (\explode("\n", $content) as $v) {
-            if (0 === \strpos($v, $m[0])) {
-                $out .= \substr($v, \strlen($m[0])) . "\n";
-                continue;
-            }
-            $out .= $v . "\n";
-        }
-        return \substr($out, 0, -1);
+    if (($dent = \strspn($content, ' ')) > 0) {
+        $content = \substr(\strtr($content, [
+            "\n" . \str_repeat(' ', $dent) => "\n"
+        ]), $dent);
     }
     return $content;
 }
@@ -95,7 +92,7 @@ if (\is_dir($folder = \LOT . \D . 'block')) {
     foreach (\g($folder, 'php') as $k => $v) {
         if (!\Hook::get('block.' . ($n = \basename($k, '.php')))) {
             (static function ($k) use ($n) {
-                \extract($GLOBALS, \EXTR_SKIP);
+                \extract(\lot(), \EXTR_SKIP);
                 if (!\is_callable($fn = require $k)) {
                     $fn = function () use ($fn) {
                         return $fn;
